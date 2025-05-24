@@ -491,14 +491,14 @@ export default function NewProjectPage() {
                             <ColorPaletteDisplay colors={aiPalette.suggestion} title="AI Suggested Palette:" />
                         )}
                          {activeColorForAiTools && !aiRepaintedImage.suggestion && !aiRepaintedImage.error && (
-                            <p className="text-sm mt-2">
+                            <div className="text-sm mt-2">
                                 Preview tinted with: <ColorSwatch color={activeColorForAiTools} size="sm" className="inline-block align-middle" /> <span style={{color: activeColorForAiTools, fontWeight: 'bold'}}>{activeColorForAiTools}</span>
-                            </p>
+                            </div>
                         )}
                          {aiRepaintedImage.suggestion && activeColorForAiTools && (
-                             <p className="text-sm mt-2">
+                             <div className="text-sm mt-2">
                                 AI Repainted with: <ColorSwatch color={activeColorForAiTools} size="sm" className="inline-block align-middle" /> <span style={{color: activeColorForAiTools, fontWeight: 'bold'}}>{activeColorForAiTools}</span>
-                            </p>
+                            </div>
                          )}
                     </div>
                 )}

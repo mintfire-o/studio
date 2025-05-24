@@ -110,13 +110,13 @@ export default function HomePage() {
     },
     {
       name: "Anusha Gupta",
-      role: "Tech Architect",
-      bio: "Engineering innovative solutions that bring sophisticated AI tools to your fingertips.",
+      role: "Founder\n\nSoftware Developer | AI Web Developer | Cybersecurity Enthusiast",
+      bio: "Skilled in software and web development, AI integration, Python automation, and secure application design. Focused on leveraging machine learning and vulnerability research to create innovative, secure solutions.",
       image: "https://placehold.co/300x300.png",
       hint: "person portrait",
       socials: {
-        linkedin: "#",
-        github: "#", 
+        linkedin: "#", // Placeholder, update as needed
+        github: "#", // Placeholder, update as needed
       },
     },
   ];

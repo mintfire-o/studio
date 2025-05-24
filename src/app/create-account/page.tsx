@@ -8,8 +8,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import type { FormData, MockStoredUser } from '@/types';
-import { Palette, KeyRound, Fingerprint, Loader2, User, Mail, Phone, LogIn, AtSign } from 'lucide-react';
+import type { MockStoredUser } from '@/types';
+import { Leaf, KeyRound, Fingerprint, Loader2, User, Mail, Phone, LogIn, AtSign } from 'lucide-react'; // Changed Palette to Leaf
 import Link from 'next/link';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { AnimatedBackground } from '@/components/animated-background';
@@ -23,7 +23,7 @@ export default function CreateAccountPage() {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [countryCode, setCountryCode] = useState('+91');
-  const [phoneNumber, setPhoneNumber] = useState(''); // This will store only the 10-digit number
+  const [phoneNumber, setPhoneNumber] = useState(''); 
   const [password, setPassword] = useState('');
   const [pin, setPin] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -97,7 +97,6 @@ export default function CreateAccountPage() {
       return;
     }
 
-    // Simulate API call / database save
     await new Promise(resolve => setTimeout(resolve, 1000));
 
     const newUserId = `user_${Date.now()}`;
@@ -107,10 +106,8 @@ export default function CreateAccountPage() {
       fullName,
       username,
       email,
-      phoneNumber: phoneNumber, // Store only the 10-digit number
-      countryCode: countryCode, // Store the country code separately
-      // IMPORTANT: In a real app, NEVER store passwords in plaintext.
-      // This is only for mock purposes. Always hash passwords.
+      phoneNumber: phoneNumber, 
+      countryCode: countryCode, 
       password, 
       pin,      
     };
@@ -138,7 +135,7 @@ export default function CreateAccountPage() {
         <Card className="w-full max-w-md shadow-2xl z-10 transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-[0_0_35px_5px_hsl(var(--primary)/0.2)] bg-card/50 backdrop-blur-sm dark:bg-card/40">
           <CardHeader className="text-center">
             <div className="mx-auto mb-4">
-              <Palette size={48} className="text-primary" />
+              <Leaf size={48} className="text-primary" /> {/* Changed Palette to Leaf */}
             </div>
             <CardTitle className="text-3xl font-bold">La Interior</CardTitle>
             <CardDescription>Create your account to start designing.</CardDescription>
@@ -205,7 +202,6 @@ export default function CreateAccountPage() {
                       <SelectItem value="+1">+1 (US)</SelectItem>
                       <SelectItem value="+44">+44 (UK)</SelectItem>
                       <SelectItem value="+61">+61 (AU)</SelectItem>
-                       {/* Add more country codes as needed */}
                     </SelectContent>
                   </Select>
                   <div className="relative flex-1">

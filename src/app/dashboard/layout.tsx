@@ -3,14 +3,12 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Palette, Home, Image as ImageIcon, History, LogOut, Menu, Settings, User } from 'lucide-react';
+import { Leaf, Home, Image as ImageIcon, History, LogOut, Menu, Settings, User } from 'lucide-react'; // Changed Palette to Leaf
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { useAuth } from '@/hooks/use-auth';
-import { cn } from '@/lib/utils';
 import React from 'react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,7 +17,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import StylusTextAnimation from '@/components/stylus-text-animation'; // Import the animation
+import StylusTextAnimation from '@/components/stylus-text-animation'; 
 
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: Home },
@@ -47,7 +45,6 @@ export default function DashboardLayout({
   }
 
   if (!user) {
-    // AuthProvider handles redirection, but this is a fallback
     return null; 
   }
   
@@ -58,7 +55,7 @@ export default function DashboardLayout({
         asChild
         variant={pathname === item.href ? 'secondary' : 'ghost'}
         className="w-full justify-start text-base"
-        onClick={() => setIsSheetOpen(false)} // Close sheet on mobile nav click
+        onClick={() => setIsSheetOpen(false)} 
       >
         <Link href={item.href}>
           <item.icon className="mr-3 h-5 w-5" />
@@ -82,7 +79,7 @@ export default function DashboardLayout({
             <SheetContent side="left" className="flex flex-col p-0 w-72">
               <div className="flex h-16 items-center border-b px-4">
                 <Link href="/dashboard" className="flex items-center gap-2 font-semibold text-lg" onClick={() => setIsSheetOpen(false)}>
-                  <Palette className="h-7 w-7 text-primary" />
+                  <Leaf className="h-7 w-7 text-primary" /> {/* Changed Palette to Leaf */}
                   <span>La Interior</span>
                 </Link>
               </div>
@@ -98,7 +95,7 @@ export default function DashboardLayout({
             </SheetContent>
           </Sheet>
            <Link href="/dashboard" className="hidden md:flex items-center gap-2 font-semibold text-lg">
-             <Palette className="h-7 w-7 text-primary" />
+             <Leaf className="h-7 w-7 text-primary" /> {/* Changed Palette to Leaf */}
              <span>La Interior</span>
            </Link>
         </div>

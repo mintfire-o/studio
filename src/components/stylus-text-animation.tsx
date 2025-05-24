@@ -2,7 +2,7 @@
 'use client';
 
 import React from 'react';
-import { Palette } from 'lucide-react';
+import { Leaf } from 'lucide-react'; // Changed Palette to Leaf
 
 const StylusTextAnimation: React.FC = () => {
   return (
@@ -40,7 +40,7 @@ const StylusTextAnimation: React.FC = () => {
         }
       `}</style>
       
-      <Palette size={52} className="text-primary mb-3" />
+      <Leaf size={52} className="text-primary mb-3" /> {/* Changed Palette to Leaf */}
       <svg viewBox="0 0 400 100" className="stylus-text-svg">
         <text x="50%" y="50%" dy=".35em" textAnchor="middle">
           <tspan className="text-path">

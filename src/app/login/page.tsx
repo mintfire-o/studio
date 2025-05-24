@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/hooks/use-auth';
 import type { FormData } from '@/types';
-import { Palette, KeyRound, Fingerprint, Loader2, Home as HomeIcon, UserPlus } from 'lucide-react';
+import { Leaf, KeyRound, Fingerprint, Loader2, Home as HomeIcon, UserPlus } from 'lucide-react'; // Changed Palette to Leaf
 import Link from 'next/link';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { AnimatedBackground } from '@/components/animated-background';
@@ -23,10 +23,8 @@ export default function LoginPage() {
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
-    // For login, we only need username, password, pin from the FormData type
     const credentials: Pick<FormData, 'username' | 'password' | 'pin'> = { username, password, pin };
-    await login(credentials as FormData); // Cast for mockLogin, real API would differ
-    // Navigation is handled by AuthProvider effect
+    await login(credentials as FormData); 
   };
 
   return (
@@ -39,7 +37,7 @@ export default function LoginPage() {
         <Card className="w-full max-w-md shadow-2xl z-10 transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-[0_0_35px_5px_hsl(var(--primary)/0.2)] bg-card/50 backdrop-blur-sm dark:bg-card/40">
           <CardHeader className="text-center">
             <div className="mx-auto mb-4">
-              <Palette size={48} className="text-primary" />
+              <Leaf size={48} className="text-primary" /> {/* Changed Palette to Leaf */}
             </div>
             <CardTitle className="text-3xl font-bold">La Interior</CardTitle>
             <CardDescription>Sign in to unlock your creative vision.</CardDescription>
@@ -53,7 +51,7 @@ export default function LoginPage() {
                   <Input
                     id="username"
                     type="text"
-                    placeholder="e.g., designer"
+                    placeholder="e.g., designer_new"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     required
@@ -82,10 +80,10 @@ export default function LoginPage() {
                    <Fingerprint className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                   <Input
                     id="pin"
-                    type="password" // Use password type to mask PIN
+                    type="password" 
                     placeholder="••••••"
                     value={pin}
-                    onChange={(e) => setPin(e.target.value.replace(/\D/g, ''))} // Allow only digits
+                    onChange={(e) => setPin(e.target.value.replace(/\D/g, ''))} 
                     maxLength={6}
                     pattern="\d{6}"
                     title="PIN must be 6 digits"

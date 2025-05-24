@@ -1,8 +1,8 @@
 
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Brain, Wand2, Edit, History, Lightbulb, Users, CheckCircle } from 'lucide-react'; // Palette was removed as it's in StylusTextAnimation
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Brain, Wand2, Edit, History, Lightbulb, Users, CheckCircle, Linkedin, Twitter, Mail, Phone, MapPin } from 'lucide-react';
 import Image from 'next/image';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { AnimatedBackground } from '@/components/animated-background';
@@ -44,6 +44,43 @@ export default function HomePage() {
     { src: "https://placehold.co/600x400.png", alt: "Cozy Reading Nook", hint: "reading nook cozy" },
     { src: "https://placehold.co/600x400.png", alt: "Chic Dining Area", hint: "dining chic" },
   ];
+
+  const teamMembers = [
+    {
+      name: "Alex Mint",
+      role: "Founder & CEO",
+      bio: "Passionate about blending AI with creative design to build intuitive tools.",
+      image: "https://placehold.co/300x300.png",
+      hint: "person portrait",
+      socials: {
+        linkedin: "#",
+        twitter: "#",
+      },
+    },
+    {
+      name: "Jamie Fire",
+      role: "Lead Developer",
+      bio: "Expert in full-stack development and bringing complex AI visions to life.",
+      image: "https://placehold.co/300x300.png",
+      hint: "person portrait",
+      socials: {
+        linkedin: "#",
+        twitter: "#",
+      },
+    },
+    {
+      name: "Casey Design",
+      role: "Head of UX/UI",
+      bio: "Dedicated to crafting user-centric experiences that are both beautiful and functional.",
+      image: "https://placehold.co/300x300.png",
+      hint: "person portrait",
+      socials: {
+        linkedin: "#",
+        twitter: "#",
+      },
+    },
+  ];
+
 
   return (
     <>
@@ -151,7 +188,89 @@ export default function HomePage() {
             </div>
           </div>
         </section>
+
+        {/* MintFire Team Section */}
+        <section className="py-16 px-4 sm:px-8 z-10 relative">
+          <div className="container mx-auto">
+            <h2 className="text-3xl font-bold text-center mb-12 text-primary">Meet the MintFire Team</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {teamMembers.map((member, index) => (
+                <Card key={index} className="text-center hover:shadow-xl transition-shadow duration-300 bg-card/80 backdrop-blur-sm">
+                  <CardHeader>
+                    <div className="relative w-36 h-36 mx-auto mb-4 rounded-full overflow-hidden border-2 border-primary">
+                      <Image 
+                        src={member.image} 
+                        alt={member.name} 
+                        width={144} 
+                        height={144} 
+                        className="object-cover"
+                        data-ai-hint={member.hint}
+                      />
+                    </div>
+                    <CardTitle className="text-xl">{member.name}</CardTitle>
+                    <CardDescription>{member.role}</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground text-sm">{member.bio}</p>
+                  </CardContent>
+                  <CardFooter className="flex justify-center gap-4 pt-4">
+                    {member.socials.linkedin && (
+                      <Button variant="ghost" size="icon" asChild>
+                        <Link href={member.socials.linkedin} target="_blank" rel="noopener noreferrer">
+                          <Linkedin className="h-5 w-5 text-primary hover:text-primary/80" />
+                        </Link>
+                      </Button>
+                    )}
+                    {member.socials.twitter && (
+                      <Button variant="ghost" size="icon" asChild>
+                        <Link href={member.socials.twitter} target="_blank" rel="noopener noreferrer">
+                          <Twitter className="h-5 w-5 text-primary hover:text-primary/80" />
+                        </Link>
+                      </Button>
+                    )}
+                  </CardFooter>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Contact Us Section */}
+        <section className="py-16 px-4 sm:px-8 bg-background/70 backdrop-blur-sm z-10 relative">
+          <div className="container mx-auto text-center">
+            <h2 className="text-3xl font-bold text-center mb-8 text-primary">Get in Touch with MintFire</h2>
+            <p className="text-lg max-w-2xl mx-auto text-muted-foreground mb-12">
+              We&apos;d love to hear from you! Whether you have questions, feedback, or just want to say hello, feel free to reach out.
+            </p>
+            <div className="grid md:grid-cols-3 gap-8 text-left max-w-4xl mx-auto">
+              <Card className="flex flex-col items-center p-6 bg-card/80 backdrop-blur-sm hover:shadow-lg transition-shadow">
+                <Mail className="h-12 w-12 text-primary mb-4" />
+                <h3 className="text-xl font-semibold mb-2">Email Us</h3>
+                <p className="text-muted-foreground hover:text-primary transition-colors">
+                  <a href="mailto:hello@mintfire.dev">hello@mintfire.dev</a>
+                </p>
+              </Card>
+              <Card className="flex flex-col items-center p-6 bg-card/80 backdrop-blur-sm hover:shadow-lg transition-shadow">
+                <Phone className="h-12 w-12 text-primary mb-4" />
+                <h3 className="text-xl font-semibold mb-2">Call Us</h3>
+                <p className="text-muted-foreground hover:text-primary transition-colors">
+                  <a href="tel:+11234567890">(123) 456-7890</a>
+                </p>
+              </Card>
+              <Card className="flex flex-col items-center p-6 bg-card/80 backdrop-blur-sm hover:shadow-lg transition-shadow">
+                <MapPin className="h-12 w-12 text-primary mb-4" />
+                <h3 className="text-xl font-semibold mb-2">Our Office</h3>
+                <p className="text-muted-foreground">
+                  123 MintFire Street<br />Design City, DC 12345
+                </p>
+              </Card>
+            </div>
+          </div>
+        </section>
+
       </div>
     </>
   );
 }
+
+    

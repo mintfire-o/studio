@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { useAuth } from '@/hooks/use-auth'; // Import useAuth
+import { useAuth } from '@/hooks/use-auth'; 
 import { Leaf, KeyRound, Fingerprint, Loader2, User, Mail, Phone, LogIn, AtSign } from 'lucide-react'; 
 import Link from 'next/link';
 import { ThemeToggle } from '@/components/theme-toggle';
@@ -28,7 +28,7 @@ export default function CreateAccountPage() {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const { toast } = useToast();
-  const auth = useAuth(); // Get auth context
+  const auth = useAuth(); 
 
   const isValidEmail = (email: string) => {
     return /^[^\s@]+@gmail\.com$/.test(email);
@@ -85,18 +85,26 @@ export default function CreateAccountPage() {
       const contentType = response.headers.get("content-type");
       if (contentType && contentType.includes("application/json")) {
         data = await response.json();
+      } else if (!response.ok) {
+        const text = await response.text();
+        const errorMessage = `Account creation failed. Status: ${response.status}. Server response: ${text || 'No additional error message from server.'}`;
+        setError(errorMessage);
+        toast({
+            title: 'Creation Failed',
+            description: errorMessage,
+            variant: 'destructive',
+        });
+        setIsLoading(false);
+        return;
       }
+
 
       if (response.ok) {
         toast({
           title: 'Account Created!',
           description: data?.message || 'Your account has been successfully created. Logging you in...',
         });
-        // Attempt to log in the new user
         await auth.login({ username, password, pin } as FormData);
-        // AuthProvider will handle redirect to dashboard if login is successful
-        // If login fails (which it shouldn't here if registration was okay), AuthProvider will show error
-        // No explicit router.push('/dashboard') needed here as AuthProvider handles it
       } else {
         const errorMessage = data?.message || `Account creation failed. Status: ${response.status}.`;
         setError(errorMessage);
@@ -108,12 +116,19 @@ export default function CreateAccountPage() {
       }
     } catch (e) {
       console.error("Registration API call error:", e);
-      const errorMessage = e instanceof Error ? e.message : 'An unexpected error occurred during registration.';
-      setError(errorMessage);
+      let toastTitle = 'Registration Error';
+      let toastDescription = 'An unexpected error occurred during registration.';
+      if (e instanceof TypeError && e.message.toLowerCase().includes('failed to fetch')) {
+          toastTitle = 'Network Error';
+          toastDescription = 'Could not connect to the server. Please check your internet connection and try again.';
+      } else if (e instanceof Error) {
+          toastDescription = e.message;
+      }
+      setError(toastDescription);
       toast({
-        title: 'Error',
-        description: errorMessage,
-        variant: 'destructive',
+          title: toastTitle,
+          description: toastDescription,
+          variant: 'destructive',
       });
     } finally {
       setIsLoading(false);

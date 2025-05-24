@@ -17,7 +17,7 @@ export interface AuthContextType {
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const MIN_LOADER_DURATION = 2000; // Reduced to 2 seconds
+const MIN_LOADER_DURATION = 2000; 
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -105,8 +105,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (contentType && contentType.includes("application/json")) {
         data = await response.json();
       } else if (!response.ok) {
+        // Handle non-JSON error responses or unexpected content types
         const text = await response.text();
-        throw new Error(data?.message || `Login failed. Status: ${response.status}. Server response: ${text}`);
+        const errorMessage = `Login failed. Status: ${response.status}. Server response: ${text || 'No additional error message from server.'}`;
+        setError(errorMessage);
+        toast({ title: 'Login Failed', description: errorMessage, variant: 'destructive' });
+        setUser(null);
+        setIsAuthReady(true);
+        return;
       }
 
 
@@ -123,9 +129,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     } catch (e) {
       console.error("Login API call error:", e);
-      const errorMessage = e instanceof Error ? e.message : 'An unexpected error occurred during login.';
-      setError(errorMessage);
-      toast({ title: 'Login Error', description: errorMessage, variant: 'destructive' });
+      let toastTitle = 'Login Error';
+      let toastDescription = 'An unexpected error occurred during login.';
+      if (e instanceof TypeError && e.message.toLowerCase().includes('failed to fetch')) {
+          toastTitle = 'Network Error';
+          toastDescription = 'Could not connect to the server. Please check your internet connection and try again.';
+      } else if (e instanceof Error) {
+          toastDescription = e.message;
+      }
+      setError(toastDescription);
+      toast({ title: toastTitle, description: toastDescription, variant: 'destructive' });
       setUser(null);
     } finally {
       setIsAuthReady(true); 

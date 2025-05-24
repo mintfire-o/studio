@@ -11,13 +11,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Loader2, UserCircle, KeyRound, Fingerprint, Edit } from 'lucide-react';
-import type { UserProfile } from '@/types'; // Use UserProfile type
+import type { UserProfile } from '@/types'; 
 
 export default function ProfilePage() {
   const { user, isLoading: authLoading } = useAuth();
   const { toast } = useToast();
 
-  const [userDetails, setUserDetails] = useState<UserProfile | null>(null); // Changed to UserProfile
+  const [userDetails, setUserDetails] = useState<UserProfile | null>(null); 
   const [isLoadingData, setIsLoadingData] = useState(true);
 
   // Password change state
@@ -43,7 +43,6 @@ export default function ProfilePage() {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',
-              // Send username for mock auth; in real app, this would be a session token
               'X-Mock-Username': user.username
             },
           });
@@ -52,10 +51,22 @@ export default function ProfilePage() {
           const contentType = response.headers.get("content-type");
           if (contentType && contentType.includes("application/json")) {
             data = await response.json();
+          } else if (!response.ok) {
+            const text = await response.text();
+            const errorMessage = `Error fetching profile. Status: ${response.status}. Server response: ${text || 'No additional error message from server.'}`;
+            toast({
+              variant: 'destructive',
+              title: 'Error fetching profile',
+              description: errorMessage,
+            });
+            setUserDetails(null);
+            setIsLoadingData(false);
+            return;
           }
 
+
           if (response.ok && data?.user) {
-            setUserDetails(data.user as UserProfile); // Cast to UserProfile
+            setUserDetails(data.user as UserProfile); 
           } else {
             toast({
               variant: 'destructive',
@@ -66,10 +77,16 @@ export default function ProfilePage() {
           }
         } catch (error) {
           console.error("Error fetching profile:", error);
+          let toastDescription = 'Failed to connect to the server to fetch profile details.';
+          if (error instanceof TypeError && error.message.toLowerCase().includes('failed to fetch')) {
+            // Already specific enough from the catch block
+          } else if (error instanceof Error) {
+            toastDescription = error.message;
+          }
           toast({
             variant: 'destructive',
             title: 'Network Error',
-            description: 'Failed to connect to the server to fetch profile details.',
+            description: toastDescription,
           });
           setUserDetails(null);
         } finally {
@@ -104,7 +121,7 @@ export default function ProfilePage() {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'X-Mock-Username': user.username // Mock auth
+            'X-Mock-Username': user.username 
         },
         body: JSON.stringify({ currentPassword, newPassword }),
       });
@@ -113,6 +130,13 @@ export default function ProfilePage() {
       const contentType = response.headers.get("content-type");
       if (contentType && contentType.includes("application/json")) {
         data = await response.json();
+      } else if (!response.ok) {
+        const text = await response.text();
+        const errorMessage = `Failed to update password. Status: ${response.status}. Server response: ${text || 'No additional error message from server.'}`;
+        setPasswordChangeError(errorMessage);
+        toast({ title: 'Update Failed', description: errorMessage, variant: 'destructive' });
+        setIsPasswordChanging(false);
+        return;
       }
 
 
@@ -126,7 +150,20 @@ export default function ProfilePage() {
       }
     } catch (error) {
         console.error("Error updating password:", error);
-        setPasswordChangeError("An unexpected error occurred while updating your password.");
+        let errorMsg = "An unexpected error occurred while updating your password.";
+        let toastTitle = 'Update Failed';
+        if (error instanceof TypeError && error.message.toLowerCase().includes('failed to fetch')) {
+            toastTitle = 'Network Error';
+            errorMsg = 'Could not connect to server to update password. Please check your internet connection.';
+        } else if (error instanceof Error) {
+            errorMsg = error.message;
+        }
+        setPasswordChangeError(errorMsg);
+        toast({
+            title: toastTitle,
+            description: errorMsg,
+            variant: 'destructive'
+        });
     } finally {
         setIsPasswordChanging(false);
     }
@@ -151,7 +188,7 @@ export default function ProfilePage() {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-Mock-Username': user.username // Mock auth
+                'X-Mock-Username': user.username 
             },
             body: JSON.stringify({ currentPin, newPin }),
         });
@@ -160,6 +197,13 @@ export default function ProfilePage() {
         const contentType = response.headers.get("content-type");
         if (contentType && contentType.includes("application/json")) {
             data = await response.json();
+        } else if (!response.ok) {
+            const text = await response.text();
+            const errorMessage = `Failed to update PIN. Status: ${response.status}. Server response: ${text || 'No additional error message from server.'}`;
+            setPinChangeError(errorMessage);
+            toast({ title: 'Update Failed', description: errorMessage, variant: 'destructive' });
+            setIsPinChanging(false);
+            return;
         }
 
 
@@ -173,7 +217,20 @@ export default function ProfilePage() {
         }
     } catch (error) {
         console.error("Error updating PIN:", error);
-        setPinChangeError("An unexpected error occurred while updating your PIN.");
+        let errorMsg = "An unexpected error occurred while updating your PIN.";
+        let toastTitle = 'Update Failed';
+        if (error instanceof TypeError && error.message.toLowerCase().includes('failed to fetch')) {
+            toastTitle = 'Network Error';
+            errorMsg = 'Could not connect to server to update PIN. Please check your internet connection.';
+        } else if (error instanceof Error) {
+            errorMsg = error.message;
+        }
+        setPinChangeError(errorMsg);
+        toast({
+            title: toastTitle,
+            description: errorMsg,
+            variant: 'destructive'
+        });
     } finally {
         setIsPinChanging(false);
     }
@@ -187,9 +244,7 @@ export default function ProfilePage() {
 
     const numberPart = userDetails.phoneNumber || '';
     const prefix = userDetails.countryCode || '';
-
-    // Remove prefix from numberPart if it's already there (simple check)
-    const cleanedNumberPart = numberPart.startsWith(prefix) ? numberPart.substring(prefix.length).trim() : numberPart;
+    const cleanedNumberPart = numberPart.startsWith(prefix) ? numberPart.substring(prefix.length).trim() : numberPart.trim();
 
     let displayPhone = prefix;
     if (prefix && cleanedNumberPart) {

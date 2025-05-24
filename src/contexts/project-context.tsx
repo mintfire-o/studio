@@ -14,7 +14,7 @@ interface ProjectContextType {
 
 const ProjectContext = createContext<ProjectContextType | undefined>(undefined);
 
-const LOCAL_STORAGE_KEY = 'colorVisionaryProjects';
+const LOCAL_STORAGE_KEY = 'laInteriorProjects';
 
 export function ProjectProvider({ children }: { children: ReactNode }) {
   const [projects, setProjects] = useState<Project[]>([]);

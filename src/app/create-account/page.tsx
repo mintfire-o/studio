@@ -60,7 +60,7 @@ export default function CreateAccountPage() {
           <div className="mx-auto mb-4">
             <Palette size={48} className="text-primary" />
           </div>
-          <CardTitle className="text-3xl font-bold">ColorVisionary</CardTitle>
+          <CardTitle className="text-3xl font-bold">La Interior</CardTitle>
           <CardDescription>Create your account to start designing.</CardDescription>
         </CardHeader>
         <CardContent>

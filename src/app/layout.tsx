@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'ColorVisionary - La interior',
-  description: 'AI-Powered Interior Color Visionary',
+  title: 'La Interior - MintFire',
+  description: 'AI-Powered Interior Design by MintFire',
 };
 
 export default function RootLayout({

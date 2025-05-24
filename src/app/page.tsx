@@ -9,10 +9,10 @@ export default function HomePage() {
         <div className="flex flex-col items-center space-y-4">
           <Palette size={64} className="text-primary" />
           <h1 className="text-5xl font-bold tracking-tight">
-            ColorVisionary
+            La Interior
           </h1>
           <p className="text-2xl text-muted-foreground">
-            by <span className="font-semibold text-primary">La interior</span>
+            by <span className="font-semibold text-primary">MintFire</span>
           </p>
         </div>
         

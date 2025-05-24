@@ -26,22 +26,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     // Check for persisted session (e.g., from localStorage)
-    const storedUser = localStorage.getItem('colorVisionaryUser');
+    const storedUser = localStorage.getItem('laInteriorUser');
     if (storedUser) {
       try {
         const parsedUser: User = JSON.parse(storedUser);
         setUser(parsedUser);
       } catch (e) {
-        localStorage.removeItem('colorVisionaryUser');
+        localStorage.removeItem('laInteriorUser');
       }
     }
     setIsLoading(false);
   }, []);
 
   useEffect(() => {
-    if (!isLoading && !user && pathname !== '/login' && pathname !== '/') {
+    if (!isLoading && !user && pathname !== '/login' && pathname !== '/' && pathname !== '/create-account') {
       router.push('/login');
-    } else if (!isLoading && user && (pathname === '/login' || pathname === '/')) {
+    } else if (!isLoading && user && (pathname === '/login' || pathname === '/' || pathname === '/create-account')) {
       router.push('/dashboard');
     }
   }, [user, isLoading, pathname, router]);
@@ -53,7 +53,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const loggedInUser = await mockLogin(credentials);
       if (loggedInUser) {
         setUser(loggedInUser);
-        localStorage.setItem('colorVisionaryUser', JSON.stringify(loggedInUser));
+        localStorage.setItem('laInteriorUser', JSON.stringify(loggedInUser));
         toast({ title: 'Login Successful', description: `Welcome back, ${loggedInUser.username}!` });
         router.push('/dashboard');
       } else {
@@ -70,7 +70,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem('colorVisionaryUser');
+    localStorage.removeItem('laInteriorUser');
     toast({ title: 'Logged Out', description: 'You have been successfully logged out.' });
     router.push('/login');
   };

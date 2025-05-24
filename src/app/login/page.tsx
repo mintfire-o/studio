@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/hooks/use-auth';
 import type { FormData } from '@/types';
-import { Palette, KeyRound, Fingerprint, Loader2, Home as HomeIcon } from 'lucide-react';
+import { Palette, KeyRound, Fingerprint, Loader2, Home as HomeIcon, UserPlus } from 'lucide-react';
 import Link from 'next/link';
 
 export default function LoginPage() {
@@ -32,7 +32,7 @@ export default function LoginPage() {
           <div className="mx-auto mb-4">
             <Palette size={48} className="text-primary" />
           </div>
-          <CardTitle className="text-3xl font-bold">ColorVisionary</CardTitle>
+          <CardTitle className="text-3xl font-bold">La Interior</CardTitle>
           <CardDescription>Sign in to unlock your creative vision.</CardDescription>
         </CardHeader>
         <CardContent>
@@ -102,7 +102,9 @@ export default function LoginPage() {
           <p>
             Don&apos;t have an account?{' '}
             <Button variant="link" className="p-0 h-auto text-xs" asChild>
-                <Link href="/create-account">Create one</Link>
+                <Link href="/create-account">
+                  <UserPlus className="mr-1 h-3 w-3" /> Create one
+                </Link>
             </Button>
           </p>
         </CardFooter>

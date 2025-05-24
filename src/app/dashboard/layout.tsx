@@ -82,7 +82,7 @@ export default function DashboardLayout({
             <SheetContent side="left" className="flex flex-col p-0 w-72">
               <div className="flex h-16 items-center border-b px-4">
                 <Link href="/dashboard" className="flex items-center gap-2 font-semibold text-lg" onClick={() => setIsSheetOpen(false)}>
-                  <Leaf className="h-7 w-7 neon-mint-leaf" /> 
+                  <Leaf className="h-7 w-7 text-primary" /> 
                   <span>La Interior</span>
                 </Link>
               </div>
@@ -98,7 +98,7 @@ export default function DashboardLayout({
             </SheetContent>
           </Sheet>
            <Link href="/dashboard" className="hidden md:flex items-center gap-2 font-semibold text-lg">
-             <Leaf className="h-7 w-7 neon-mint-leaf" /> 
+             <Leaf className="h-7 w-7 text-primary" /> 
              <span>La Interior</span>
            </Link>
         </div>

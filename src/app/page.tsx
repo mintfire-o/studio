@@ -2,11 +2,12 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Brain, Wand2, Edit, History, Lightbulb, Users, CheckCircle, Linkedin, Twitter, Mail, Phone, MapPin, SquarePen, WandSparkles, CircleCheckBig, Globe } from 'lucide-react';
+import { Brain, History, Lightbulb, Users, CheckCircle, Linkedin, Twitter, Mail, Phone, MapPin, SquarePen, WandSparkles, CircleCheckBig, Globe } from 'lucide-react';
 import Image from 'next/image';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { AnimatedBackground } from '@/components/animated-background';
 import StylusTextAnimation from '@/components/stylus-text-animation';
+import React from 'react';
 
 export default function HomePage() {
   const features = [
@@ -53,8 +54,8 @@ export default function HomePage() {
       image: "https://placehold.co/300x300.png",
       hint: "person portrait",
       socials: {
-        linkedin: "#",
-        twitter: "#",
+        linkedin: "https://www.linkedin.com/in/avik-samanta-05766a192/",
+        twitter: "https://x.com/isamantaavik",
       },
     },
     {
@@ -67,6 +68,45 @@ export default function HomePage() {
         linkedin: "#",
         twitter: "#",
       },
+    },
+  ];
+
+  const contactInfo = [
+    {
+      icon: <Globe className="h-12 w-12 text-primary mb-4" />,
+      title: (
+        <a href="https://mintfire.onrender.com/" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
+          Official Website
+        </a>
+      ),
+      details: (
+        <a href="https://mintfire.onrender.com/" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors text-sm">
+          mintfire.onrender.com
+        </a>
+      ),
+    },
+    {
+      icon: <Mail className="h-12 w-12 text-primary mb-4" />,
+      title: "Email Us",
+      details: (
+        <a href="mailto:hello@mintfire.dev" className="hover:text-primary transition-colors">
+          hello@mintfire.dev
+        </a>
+      ),
+    },
+    {
+      icon: <Phone className="h-12 w-12 text-primary mb-4" />,
+      title: "Call Us",
+      details: (
+        <a href="tel:+11234567890" className="hover:text-primary transition-colors">
+          (123) 456-7890
+        </a>
+      ),
+    },
+    {
+      icon: <MapPin className="h-12 w-12 text-primary mb-4" />,
+      title: "Our Office",
+      details: "123 MintFire Street<br />Design City, DC 12345",
     },
   ];
 
@@ -231,37 +271,20 @@ export default function HomePage() {
             <p className="text-lg max-w-2xl mx-auto text-muted-foreground mb-12">
               We&apos;d love to hear from you! Whether you have questions, feedback, or just want to say hello, feel free to reach out.
             </p>
-            <div className="grid md:grid-cols-3 gap-8 text-left max-w-4xl mx-auto">
-              <Card className="flex flex-col items-center p-6 bg-card/80 backdrop-blur-sm hover:shadow-lg transition-shadow">
-                <Globe className="h-12 w-12 text-primary mb-4" />
-                <h3 className="text-xl font-semibold mb-2">Official Website</h3>
-                <p className="text-muted-foreground hover:text-primary transition-colors">
-                  <a href="https://mintfire.onrender.com/" target="_blank" rel="noopener noreferrer">
-                    mintfire.onrender.com
-                  </a>
-                </p>
-              </Card>
-              <Card className="flex flex-col items-center p-6 bg-card/80 backdrop-blur-sm hover:shadow-lg transition-shadow">
-                <Mail className="h-12 w-12 text-primary mb-4" />
-                <h3 className="text-xl font-semibold mb-2">Email Us</h3>
-                <p className="text-muted-foreground hover:text-primary transition-colors">
-                  <a href="mailto:hello@mintfire.dev">hello@mintfire.dev</a>
-                </p>
-              </Card>
-              <Card className="flex flex-col items-center p-6 bg-card/80 backdrop-blur-sm hover:shadow-lg transition-shadow">
-                <Phone className="h-12 w-12 text-primary mb-4" />
-                <h3 className="text-xl font-semibold mb-2">Call Us</h3>
-                <p className="text-muted-foreground hover:text-primary transition-colors">
-                  <a href="tel:+11234567890">(123) 456-7890</a>
-                </p>
-              </Card>
-              <Card className="flex flex-col items-center p-6 bg-card/80 backdrop-blur-sm hover:shadow-lg transition-shadow">
-                <MapPin className="h-12 w-12 text-primary mb-4" />
-                <h3 className="text-xl font-semibold mb-2">Our Office</h3>
-                <p className="text-muted-foreground">
-                  123 MintFire Street<br />Design City, DC 12345
-                </p>
-              </Card>
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-4xl mx-auto">
+              {contactInfo.map((item, index) => (
+                <Card key={index} className="flex flex-col items-center p-6 bg-card/80 backdrop-blur-sm hover:shadow-lg transition-shadow">
+                  {item.icon}
+                  <h3 className="text-xl font-semibold mb-2">{item.title}</h3>
+                  {typeof item.details === 'string' ? (
+                    <p className="text-muted-foreground text-center">{item.details.split('<br />').map((line, i) => <React.Fragment key={i}>{line}{i < item.details.split('<br />').length - 1 && <br />}</React.Fragment>)}</p>
+                  ) : (
+                    <p className="text-muted-foreground text-center"> {/* Removed hover from p, let <a> handle it */}
+                      {item.details}
+                    </p>
+                  )}
+                </Card>
+              ))}
             </div>
           </div>
         </section>

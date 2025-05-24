@@ -5,6 +5,7 @@ import './globals.css';
 import { AuthProvider } from '@/components/auth-provider';
 import { Toaster } from '@/components/ui/toaster';
 import { ProjectProvider } from '@/contexts/project-context';
+import Link from 'next/link'; // Added for footer link
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -38,7 +39,6 @@ export default function RootLayout({
                     const preference = localStorage.getItem('theme-preference');
                     if (preference === 'dark') return 'dark';
                     if (preference === 'light') return 'light';
-                    // If 'system' or no preference, check system
                     if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
                       return 'dark';
                     }
@@ -58,11 +58,18 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen`}>
         <AuthProvider>
           <ProjectProvider>
-            {children}
+            <main className="flex-grow">
+              {children}
+            </main>
             <Toaster />
+            <footer className="w-full py-6 text-center text-sm text-muted-foreground border-t border-border bg-background">
+              © {new Date().getFullYear()} La Interior. All rights reserved by MintFire.
+              {/* Example of an optional link in footer */}
+              {/* <Link href="/privacy-policy" className="ml-2 hover:text-primary">Privacy Policy</Link> */}
+            </footer>
           </ProjectProvider>
         </AuthProvider>
       </body>

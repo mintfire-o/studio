@@ -43,7 +43,7 @@ export default function ProfilePage() {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',
-              'X-Mock-Username': user.username
+              'X-Mock-Username': user.username // Mock auth header
             },
           });
 
@@ -51,17 +51,22 @@ export default function ProfilePage() {
           const contentType = response.headers.get("content-type");
           if (contentType && contentType.includes("application/json")) {
             data = await response.json();
-          } else if (!response.ok) {
+          } else { // Handle non-JSON or error responses
             const text = await response.text();
             const errorMessage = `Error fetching profile. Status: ${response.status}. Server response: ${text || 'No additional error message from server.'}`;
-            toast({
-              variant: 'destructive',
-              title: 'Error fetching profile',
-              description: errorMessage,
-            });
-            setUserDetails(null);
-            setIsLoadingData(false);
-            return;
+            if (!response.ok) {
+                toast({
+                    variant: 'destructive',
+                    title: 'Error fetching profile',
+                    description: errorMessage,
+                });
+                setUserDetails(null);
+                setIsLoadingData(false);
+                return;
+            }
+            // If response.ok but not JSON, something is unexpected
+            console.warn("Profile API response was not JSON:", text);
+            data = { user: null, message: "Unexpected response format from server."};
           }
 
 
@@ -77,12 +82,13 @@ export default function ProfilePage() {
           }
         } catch (error) {
           console.error("Error fetching profile:", error);
-          let toastTitle = 'Network Error';
-          let toastDescription = 'Failed to connect to the server to fetch profile details.';
+          let toastTitle = 'Fetch Error';
+          let toastDescription = 'An unexpected error occurred while fetching profile details.';
           if (error instanceof TypeError && error.message.toLowerCase().includes('failed to fetch')) {
-            toastDescription = 'Could not connect to the server. Please check your internet connection and try again.';
+              toastTitle = 'Network Error';
+              toastDescription = 'Could not connect to the server. Please check your internet connection and try again.';
           } else if (error instanceof Error) {
-            toastDescription = error.message;
+              toastDescription = error.message;
           }
           toast({
             variant: 'destructive',
@@ -94,11 +100,11 @@ export default function ProfilePage() {
           setIsLoadingData(false);
         }
       } else {
-        setIsLoadingData(false);
+        setIsLoadingData(false); // No user to fetch for
       }
     };
 
-    if (!authLoading) {
+    if (!authLoading) { // Only fetch if auth state is resolved
         fetchUserDetails();
     }
   }, [user, authLoading, toast]);
@@ -122,7 +128,7 @@ export default function ProfilePage() {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'X-Mock-Username': user.username 
+            'X-Mock-Username': user.username // Mock auth header
         },
         body: JSON.stringify({ currentPassword, newPassword }),
       });
@@ -131,13 +137,17 @@ export default function ProfilePage() {
       const contentType = response.headers.get("content-type");
       if (contentType && contentType.includes("application/json")) {
         data = await response.json();
-      } else if (!response.ok) {
+      } else { // Handle non-JSON or error responses
         const text = await response.text();
         const errorMessage = `Failed to update password. Status: ${response.status}. Server response: ${text || 'No additional error message from server.'}`;
-        setPasswordChangeError(errorMessage);
-        toast({ title: 'Update Failed', description: errorMessage, variant: 'destructive' });
-        setIsPasswordChanging(false);
-        return;
+        if (!response.ok) {
+            setPasswordChangeError(errorMessage);
+            toast({ title: 'Update Failed', description: errorMessage, variant: 'destructive' });
+            setIsPasswordChanging(false);
+            return;
+        }
+         console.warn("Update password API response was not JSON:", text);
+         data = { message: "Password updated, but server response format was unexpected." };
       }
 
 
@@ -151,7 +161,7 @@ export default function ProfilePage() {
       }
     } catch (error) {
         console.error("Error updating password:", error);
-        let toastTitle = 'Update Failed';
+        let toastTitle = 'Update Error';
         let errorMsg = "An unexpected error occurred while updating your password.";
         if (error instanceof TypeError && error.message.toLowerCase().includes('failed to fetch')) {
             toastTitle = 'Network Error';
@@ -189,7 +199,7 @@ export default function ProfilePage() {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-Mock-Username': user.username 
+                'X-Mock-Username': user.username // Mock auth header
             },
             body: JSON.stringify({ currentPin, newPin }),
         });
@@ -198,15 +208,18 @@ export default function ProfilePage() {
         const contentType = response.headers.get("content-type");
         if (contentType && contentType.includes("application/json")) {
             data = await response.json();
-        } else if (!response.ok) {
+        } else { // Handle non-JSON or error responses
             const text = await response.text();
             const errorMessage = `Failed to update PIN. Status: ${response.status}. Server response: ${text || 'No additional error message from server.'}`;
-            setPinChangeError(errorMessage);
-            toast({ title: 'Update Failed', description: errorMessage, variant: 'destructive' });
-            setIsPinChanging(false);
-            return;
+            if(!response.ok) {
+                setPinChangeError(errorMessage);
+                toast({ title: 'Update Failed', description: errorMessage, variant: 'destructive' });
+                setIsPinChanging(false);
+                return;
+            }
+            console.warn("Update PIN API response was not JSON:", text);
+            data = { message: "PIN updated, but server response format was unexpected." };
         }
-
 
         if (response.ok) {
             toast({ title: "PIN Updated", description: data?.message || "Your PIN has been successfully changed." });
@@ -218,7 +231,7 @@ export default function ProfilePage() {
         }
     } catch (error) {
         console.error("Error updating PIN:", error);
-        let toastTitle = 'Update Failed';
+        let toastTitle = 'Update Error';
         let errorMsg = "An unexpected error occurred while updating your PIN.";
         if (error instanceof TypeError && error.message.toLowerCase().includes('failed to fetch')) {
             toastTitle = 'Network Error';
@@ -245,15 +258,16 @@ export default function ProfilePage() {
 
     const numberPart = userDetails.phoneNumber || '';
     const prefix = userDetails.countryCode || '';
+    // Clean the numberPart if it accidentally starts with the prefix (e.g. from older data)
     const cleanedNumberPart = numberPart.startsWith(prefix) ? numberPart.substring(prefix.length).trim() : numberPart.trim();
 
     let displayPhone = prefix;
     if (prefix && cleanedNumberPart) {
       displayPhone += ` ${cleanedNumberPart}`;
     } else if (cleanedNumberPart) {
-      displayPhone = cleanedNumberPart;
+      displayPhone = cleanedNumberPart; // Only show number if prefix is missing
     }
-
+    // If only prefix is available and numberPart is empty, just show prefix or 'Not Provided' if both empty.
     return displayPhone.trim() || 'Not Provided';
   };
 
@@ -310,7 +324,7 @@ export default function ProfilePage() {
       <Separator className="my-8" />
 
       <div className="grid md:grid-cols-2 gap-8">
-        <Card className="shadow-lg border-secondary/50 hover:shadow-xl hover:border-primary/50 transition-all duration-300 ease-in-out">
+        <Card className="shadow-lg border-input hover:shadow-xl hover:border-primary/50 transition-all duration-300 ease-in-out">
           <CardHeader>
             <CardTitle className="flex items-center text-xl">
               <KeyRound className="mr-2 h-6 w-6 text-secondary-foreground" /> Change Password
@@ -340,7 +354,7 @@ export default function ProfilePage() {
           </CardContent>
         </Card>
 
-        <Card className="shadow-lg border-accent/50 hover:shadow-xl hover:border-primary/50 transition-all duration-300 ease-in-out">
+        <Card className="shadow-lg border-input hover:shadow-xl hover:border-primary/50 transition-all duration-300 ease-in-out">
           <CardHeader>
             <CardTitle className="flex items-center text-xl">
               <Fingerprint className="mr-2 h-6 w-6 text-accent-foreground" /> Change PIN
@@ -373,3 +387,5 @@ export default function ProfilePage() {
     </div>
   );
 }
+
+    

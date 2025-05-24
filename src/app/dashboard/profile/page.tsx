@@ -11,14 +11,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Loader2, UserCircle, KeyRound, Fingerprint, Edit } from 'lucide-react';
-import type { MockStoredUser } from '@/types';
-
+import type { UserProfile } from '@/types'; // Use UserProfile type
 
 export default function ProfilePage() {
-  const { user, isLoading: authLoading } = useAuth(); // Assuming user object from useAuth has basic details
+  const { user, isLoading: authLoading } = useAuth();
   const { toast } = useToast();
 
-  const [userDetails, setUserDetails] = useState<MockStoredUser | null>(null);
+  const [userDetails, setUserDetails] = useState<UserProfile | null>(null); // Changed to UserProfile
   const [isLoadingData, setIsLoadingData] = useState(true);
 
   // Password change state
@@ -42,13 +41,13 @@ export default function ProfilePage() {
         try {
           const response = await fetch('/api/user/profile', {
             method: 'GET',
-            headers: { 
+            headers: {
               'Content-Type': 'application/json',
-              // In a real app, send an auth token. For mock, using X-Mock-Username.
-              'X-Mock-Username': user.username 
+              // Send username for mock auth; in real app, this would be a session token
+              'X-Mock-Username': user.username
             },
           });
-          
+
           let data;
           const contentType = response.headers.get("content-type");
           if (contentType && contentType.includes("application/json")) {
@@ -56,14 +55,14 @@ export default function ProfilePage() {
           }
 
           if (response.ok && data?.user) {
-            setUserDetails(data.user);
+            setUserDetails(data.user as UserProfile); // Cast to UserProfile
           } else {
             toast({
               variant: 'destructive',
               title: 'Error fetching profile',
               description: data?.message || 'Could not load profile details.',
             });
-            setUserDetails(null); // Clear details on error
+            setUserDetails(null);
           }
         } catch (error) {
           console.error("Error fetching profile:", error);
@@ -77,11 +76,11 @@ export default function ProfilePage() {
           setIsLoadingData(false);
         }
       } else {
-        setIsLoadingData(false); // No user to fetch for
+        setIsLoadingData(false);
       }
     };
 
-    if (!authLoading) { // Only fetch if auth state is settled
+    if (!authLoading) {
         fetchUserDetails();
     }
   }, [user, authLoading, toast]);
@@ -103,9 +102,9 @@ export default function ProfilePage() {
     try {
       const response = await fetch('/api/user/update-password', {
         method: 'POST',
-        headers: { 
+        headers: {
             'Content-Type': 'application/json',
-            'X-Mock-Username': user.username // For mock auth on API
+            'X-Mock-Username': user.username // Mock auth
         },
         body: JSON.stringify({ currentPassword, newPassword }),
       });
@@ -115,6 +114,7 @@ export default function ProfilePage() {
       if (contentType && contentType.includes("application/json")) {
         data = await response.json();
       }
+
 
       if (response.ok) {
         toast({ title: "Password Updated", description: data?.message || "Your password has been successfully changed." });
@@ -144,14 +144,14 @@ export default function ProfilePage() {
       return;
     }
     if (!user?.username) return;
-    
+
     setIsPinChanging(true);
     try {
         const response = await fetch('/api/user/update-pin', {
             method: 'POST',
-            headers: { 
+            headers: {
                 'Content-Type': 'application/json',
-                'X-Mock-Username': user.username // For mock auth on API
+                'X-Mock-Username': user.username // Mock auth
             },
             body: JSON.stringify({ currentPin, newPin }),
         });
@@ -161,7 +161,8 @@ export default function ProfilePage() {
         if (contentType && contentType.includes("application/json")) {
             data = await response.json();
         }
-        
+
+
         if (response.ok) {
             toast({ title: "PIN Updated", description: data?.message || "Your PIN has been successfully changed." });
             setCurrentPin('');
@@ -177,25 +178,26 @@ export default function ProfilePage() {
         setIsPinChanging(false);
     }
   };
-  
+
   const getDisplayPhoneNumber = () => {
     if (!userDetails) return 'Loading...';
     if (!userDetails.phoneNumber && !userDetails.countryCode) {
       return 'Not Provided';
     }
-    
-    let numberPart = userDetails.phoneNumber || '';
+
+    const numberPart = userDetails.phoneNumber || '';
     const prefix = userDetails.countryCode || '';
-    
-    // This logic assumes phone number from API/DB doesn't already include prefix
-    // If it might, further cleanup would be needed here.
+
+    // Remove prefix from numberPart if it's already there (simple check)
+    const cleanedNumberPart = numberPart.startsWith(prefix) ? numberPart.substring(prefix.length).trim() : numberPart;
+
     let displayPhone = prefix;
-    if (prefix && numberPart) {
-      displayPhone += ` ${numberPart}`;
-    } else if (numberPart) { 
-      displayPhone = numberPart;
+    if (prefix && cleanedNumberPart) {
+      displayPhone += ` ${cleanedNumberPart}`;
+    } else if (cleanedNumberPart) {
+      displayPhone = cleanedNumberPart;
     }
-    
+
     return displayPhone.trim() || 'Not Provided';
   };
 

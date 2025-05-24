@@ -55,8 +55,8 @@ const teamMembers = [
     image: "https://placehold.co/300x300.png",
     hint: "person portrait",
     socials: {
-      linkedin: "https://www.linkedin.com/in/avik-samanta-05766a192/",
-      github: "https://github.com/avksamanta", 
+      linkedin: "https://www.linkedin.com/in/avik-samanta-root/",
+      github: "https://github.com/avik-root", 
     },
   },
   {
@@ -66,8 +66,8 @@ const teamMembers = [
     image: "https://placehold.co/300x300.png",
     hint: "person portrait",
     socials: {
-      linkedin: "#", 
-      github: "#", 
+      linkedin: "https://www.linkedin.com/in/anusha-gupta-ofc/", 
+      github: "https://github.com/anushagupta11", 
     },
   },
 ];

@@ -4,7 +4,7 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Brain, History, Lightbulb, Users, CheckCircle, Linkedin, Github, Mail, Phone, MapPin, SquarePen, WandSparkles, CircleCheckBig, Globe, Loader2, AlertTriangle } from 'lucide-react';
+import { Brain, History, Lightbulb, Users, CheckCircle, Linkedin, Github, Mail, Phone, MapPin, SquarePen, WandSparkles, CircleCheckBig, Globe, Loader2, AlertTriangle, Leaf } from 'lucide-react';
 import Image from 'next/image';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { AnimatedBackground } from '@/components/animated-background';
@@ -99,8 +99,8 @@ export default function HomePage() {
   const teamMembers = [
     {
       name: "Avik Samanta",
-      role: "Visionary Lead",
-      bio: "Driving the fusion of AI and design to empower creative expression.",
+      role: "Founder\n\nCybersecurity Engineer | Blockchain Specialist | Bug Bounty Hunter",
+      bio: "Skilled in vulnerability research, ethical hacking, and securing digital infrastructures. Passionate about advancing blockchain security, identifying threats, and building innovative security solutions.",
       image: "https://placehold.co/300x300.png",
       hint: "person portrait",
       socials: {
@@ -305,11 +305,11 @@ export default function HomePage() {
                         data-ai-hint={member.hint}
                       />
                     </div>
-                    <CardTitle className="text-xl">{member.name}</CardTitle>
-                    <CardDescription>{member.role}</CardDescription>
+                    <CardTitle className="text-xl whitespace-pre-line">{member.name}</CardTitle>
+                    <CardDescription className="whitespace-pre-line">{member.role}</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-muted-foreground text-sm">{member.bio}</p>
+                    <p className="text-muted-foreground text-sm whitespace-pre-line">{member.bio}</p>
                   </CardContent>
                   <CardFooter className="flex justify-center gap-4 pt-4">
                     {member.socials.linkedin && (
@@ -362,3 +362,4 @@ export default function HomePage() {
     </>
   );
 }
+

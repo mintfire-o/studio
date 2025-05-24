@@ -8,21 +8,21 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import type { FormData } from '@/types';
+import type { FormData, MockStoredUser } from '@/types';
 import { Palette, KeyRound, Fingerprint, Loader2, User, Mail, Phone, LogIn, AtSign } from 'lucide-react';
 import Link from 'next/link';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { AnimatedBackground } from '@/components/animated-background';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-// Mock list of taken usernames for demonstration
-const MOCK_TAKEN_USERNAMES = ['admin', 'root', 'superuser', 'testuser'];
+const MOCK_HARDCODED_TAKEN_USERNAMES = ['admin', 'root', 'superuser', 'testuser'];
+const MOCK_USERS_DB_KEY = 'laInteriorMockUsersDB';
 
 export default function CreateAccountPage() {
   const [fullName, setFullName] = useState('');
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
-  const [countryCode, setCountryCode] = useState('+91'); // Default to India
+  const [countryCode, setCountryCode] = useState('+91');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [password, setPassword] = useState('');
   const [pin, setPin] = useState('');
@@ -32,13 +32,25 @@ export default function CreateAccountPage() {
   const { toast } = useToast();
 
   const isValidEmail = (email: string) => {
-    // Gmail-only validation
     return /^[^\s@]+@gmail\.com$/.test(email);
   };
 
   const isValidPhoneNumber = (phone: string) => {
-    // Basic phone validation (e.g., 10 digits for many regions)
     return /^\d{10}$/.test(phone);
+  };
+
+  const getMockUsersFromStorage = (): Record<string, MockStoredUser> => {
+    if (typeof window !== 'undefined') {
+      const storedUsers = localStorage.getItem(MOCK_USERS_DB_KEY);
+      return storedUsers ? JSON.parse(storedUsers) : {};
+    }
+    return {};
+  };
+
+  const saveMockUserToStorage = (users: Record<string, MockStoredUser>) => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(MOCK_USERS_DB_KEY, JSON.stringify(users));
+    }
   };
 
   const handleSubmit = async (event: FormEvent) => {
@@ -56,11 +68,14 @@ export default function CreateAccountPage() {
       setIsLoading(false);
       return;
     }
-    if (MOCK_TAKEN_USERNAMES.includes(username.toLowerCase())) {
+
+    const mockUsers = getMockUsersFromStorage();
+    if (MOCK_HARDCODED_TAKEN_USERNAMES.includes(username.toLowerCase()) || mockUsers[username.toLowerCase()]) {
       setError(`Username "${username}" is already taken. Please choose another.`);
       setIsLoading(false);
       return;
     }
+
     if (!isValidEmail(email)) {
       setError("Please enter a valid @gmail.com email address.");
       setIsLoading(false);
@@ -86,21 +101,29 @@ export default function CreateAccountPage() {
     await new Promise(resolve => setTimeout(resolve, 1000));
 
     const completePhoneNumber = `${countryCode}${phoneNumber}`;
+    const newUserId = `user_${Date.now()}`;
 
-    // Mock data collected:
-    const accountData: Partial<FormData> = {
+    const newUser: MockStoredUser = {
+      id: newUserId,
       fullName,
       username,
       email,
       phoneNumber: completePhoneNumber,
-      password, // In a real app, password would be hashed
-      pin,      // In a real app, PIN would be handled securely
+      countryCode,
+      // IMPORTANT: In a real app, NEVER store passwords in plaintext.
+      // This is only for mock purposes. Always hash passwords.
+      password, 
+      pin,      
     };
-    console.log('Mock Account Data to be saved:', accountData);
+
+    mockUsers[username.toLowerCase()] = newUser;
+    saveMockUserToStorage(mockUsers);
+    
+    console.log('Mock Account Data saved to localStorage:', newUser);
 
     setIsLoading(false);
     toast({
-      title: 'Account Created (Mock)',
+      title: 'Account Created!',
       description: 'Your account has been successfully created. Please proceed to login.',
     });
     router.push('/login');
@@ -175,7 +198,7 @@ export default function CreateAccountPage() {
                 <Label htmlFor="phoneNumber">Phone Number</Label>
                 <div className="flex gap-2">
                   <Select value={countryCode} onValueChange={setCountryCode}>
-                    <SelectTrigger className="w-[80px] hover:border-primary/50 focus:border-primary transition-colors duration-300">
+                    <SelectTrigger className="w-[100px] hover:border-primary/50 focus:border-primary transition-colors duration-300">
                       <SelectValue placeholder="Code" />
                     </SelectTrigger>
                     <SelectContent>
@@ -183,6 +206,7 @@ export default function CreateAccountPage() {
                       <SelectItem value="+1">+1 (US)</SelectItem>
                       <SelectItem value="+44">+44 (UK)</SelectItem>
                       <SelectItem value="+61">+61 (AU)</SelectItem>
+                       {/* Add more country codes as needed */}
                     </SelectContent>
                   </Select>
                   <div className="relative flex-1">
@@ -192,7 +216,7 @@ export default function CreateAccountPage() {
                       type="tel"
                       placeholder="10-digit phone number"
                       value={phoneNumber}
-                      onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, ''))} // Allow only digits
+                      onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, ''))} 
                       maxLength={10}
                       pattern="\d{10}"
                       title="Phone number must be 10 digits"
@@ -226,10 +250,10 @@ export default function CreateAccountPage() {
                    <Fingerprint className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                   <Input
                     id="pin"
-                    type="password" // Mask PIN input
+                    type="password" 
                     placeholder="Set your 6-digit PIN"
                     value={pin}
-                    onChange={(e) => setPin(e.target.value.replace(/\D/g, ''))} // Allow only digits
+                    onChange={(e) => setPin(e.target.value.replace(/\D/g, ''))} 
                     maxLength={6}
                     pattern="\d{6}"
                     title="PIN must be 6 digits"

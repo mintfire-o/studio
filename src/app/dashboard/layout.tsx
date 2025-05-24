@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Palette, Home, Image as ImageIcon, History, LogOut, Menu, Settings } from 'lucide-react';
+import { Palette, Home, Image as ImageIcon, History, LogOut, Menu, Settings, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { ThemeToggle } from '@/components/theme-toggle';
@@ -106,12 +106,9 @@ export default function DashboardLayout({
           <ThemeToggle />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="relative h-10 w-10 rounded-full p-0">
-                <Avatar className="h-9 w-9">
-                  {/* Add AvatarImage if you have user profile images */}
-                  {/* <AvatarImage src={user?.profileImageUrl} alt={user?.username} /> */}
-                  <AvatarFallback>{user?.username?.charAt(0).toUpperCase() || 'U'}</AvatarFallback>
-                </Avatar>
+              <Button variant="ghost" size="icon" className="rounded-full">
+                <User className="h-5 w-5" />
+                <span className="sr-only">Open user menu</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56" align="end" forceMount>

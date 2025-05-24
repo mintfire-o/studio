@@ -8,11 +8,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/use-auth'; // Import useAuth
 import { Leaf, KeyRound, Fingerprint, Loader2, User, Mail, Phone, LogIn, AtSign } from 'lucide-react'; 
 import Link from 'next/link';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { AnimatedBackground } from '@/components/animated-background';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import type { FormData } from '@/types';
 
 export default function CreateAccountPage() {
   const [fullName, setFullName] = useState('');
@@ -26,6 +28,7 @@ export default function CreateAccountPage() {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const { toast } = useToast();
+  const auth = useAuth(); // Get auth context
 
   const isValidEmail = (email: string) => {
     return /^[^\s@]+@gmail\.com$/.test(email);
@@ -87,9 +90,13 @@ export default function CreateAccountPage() {
       if (response.ok) {
         toast({
           title: 'Account Created!',
-          description: data?.message || 'Your account has been successfully created. Please proceed to login.',
+          description: data?.message || 'Your account has been successfully created. Logging you in...',
         });
-        router.push('/login');
+        // Attempt to log in the new user
+        await auth.login({ username, password, pin } as FormData);
+        // AuthProvider will handle redirect to dashboard if login is successful
+        // If login fails (which it shouldn't here if registration was okay), AuthProvider will show error
+        // No explicit router.push('/dashboard') needed here as AuthProvider handles it
       } else {
         const errorMessage = data?.message || `Account creation failed. Status: ${response.status}.`;
         setError(errorMessage);
@@ -246,8 +253,8 @@ export default function CreateAccountPage() {
                 </div>
               </div>
               {error && <p className="text-sm text-destructive text-center pt-2">{error}</p>}
-              <Button type="submit" className="w-full text-lg py-3 mt-6 transition-all duration-300 ease-in-out hover:shadow-lg transform hover:scale-[1.02]" disabled={isLoading}>
-                {isLoading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : 'Create Account'}
+              <Button type="submit" className="w-full text-lg py-3 mt-6 transition-all duration-300 ease-in-out hover:shadow-lg transform hover:scale-[1.02]" disabled={isLoading || auth.isLoading}>
+                {(isLoading || auth.isLoading) ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : 'Create Account'}
               </Button>
             </form>
           </CardContent>

@@ -9,8 +9,23 @@ export default function HomePage() {
       <div className="fixed top-4 right-4 z-50">
         <ThemeToggle />
       </div>
-      <main className="flex flex-col items-center justify-center min-h-screen p-8 bg-background text-foreground">
-        <div className="text-center space-y-8 max-w-md">
+      <main className="relative flex flex-col items-center justify-center min-h-screen p-8 text-foreground overflow-hidden">
+        <div
+          className="absolute inset-0 -z-10 animate-waving-glitter bg-300%"
+          style={{
+            backgroundImage: `linear-gradient(135deg, 
+              hsl(var(--background)) 0%, 
+              hsl(var(--primary) / 0.5) 15%, 
+              hsl(var(--accent) / 0.7) 30%, 
+              hsl(var(--muted)) 45%,
+              hsl(var(--foreground) / 0.4) 55%, 
+              hsl(var(--accent) / 0.7) 70%, 
+              hsl(var(--primary) / 0.5) 85%, 
+              hsl(var(--background)) 100%
+            )`,
+          }}
+        ></div>
+        <div className="text-center space-y-8 max-w-md z-10"> {/* Ensure content is above background */}
           <div className="flex flex-col items-center space-y-4">
             <Palette size={64} className="text-primary" />
             <h1 className="text-5xl font-bold tracking-tight">

@@ -11,11 +11,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Loader2, UserCircle, KeyRound, Fingerprint, Edit } from 'lucide-react';
-import { getUserDetails, updateUserDetails } from '@/lib/user-service';
 import type { MockStoredUser } from '@/types';
 
+
 export default function ProfilePage() {
-  const { user, isLoading: authLoading } = useAuth();
+  const { user, isLoading: authLoading } = useAuth(); // Assuming user object from useAuth has basic details
   const { toast } = useToast();
 
   const [userDetails, setUserDetails] = useState<MockStoredUser | null>(null);
@@ -36,14 +36,55 @@ export default function ProfilePage() {
   const [isPinChanging, setIsPinChanging] = useState(false);
 
   useEffect(() => {
-    if (user && user.username) {
-      const details = getUserDetails(user.username);
-      if (details) {
-        setUserDetails(details);
+    const fetchUserDetails = async () => {
+      if (user?.username) {
+        setIsLoadingData(true);
+        try {
+          const response = await fetch('/api/user/profile', {
+            method: 'GET',
+            headers: { 
+              'Content-Type': 'application/json',
+              // In a real app, send an auth token. For mock, using X-Mock-Username.
+              'X-Mock-Username': user.username 
+            },
+          });
+          
+          let data;
+          const contentType = response.headers.get("content-type");
+          if (contentType && contentType.includes("application/json")) {
+            data = await response.json();
+          }
+
+          if (response.ok && data?.user) {
+            setUserDetails(data.user);
+          } else {
+            toast({
+              variant: 'destructive',
+              title: 'Error fetching profile',
+              description: data?.message || 'Could not load profile details.',
+            });
+            setUserDetails(null); // Clear details on error
+          }
+        } catch (error) {
+          console.error("Error fetching profile:", error);
+          toast({
+            variant: 'destructive',
+            title: 'Network Error',
+            description: 'Failed to connect to the server to fetch profile details.',
+          });
+          setUserDetails(null);
+        } finally {
+          setIsLoadingData(false);
+        }
+      } else {
+        setIsLoadingData(false); // No user to fetch for
       }
+    };
+
+    if (!authLoading) { // Only fetch if auth state is settled
+        fetchUserDetails();
     }
-    setIsLoadingData(false);
-  }, [user]);
+  }, [user, authLoading, toast]);
 
   const handlePasswordChange = async (e: FormEvent) => {
     e.preventDefault();
@@ -56,30 +97,39 @@ export default function ProfilePage() {
       setPasswordChangeError("New password must be at least 6 characters long.");
       return;
     }
-    if (!user || !userDetails) return;
+    if (!user?.username) return;
 
     setIsPasswordChanging(true);
-    // Simulate API call / longer process
-    await new Promise(resolve => setTimeout(resolve, 500));
+    try {
+      const response = await fetch('/api/user/update-password', {
+        method: 'POST',
+        headers: { 
+            'Content-Type': 'application/json',
+            'X-Mock-Username': user.username // For mock auth on API
+        },
+        body: JSON.stringify({ currentPassword, newPassword }),
+      });
 
-    if (userDetails.password !== currentPassword) {
-      setPasswordChangeError("Current password incorrect.");
-      setIsPasswordChanging(false);
-      return;
-    }
+      let data;
+      const contentType = response.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        data = await response.json();
+      }
 
-    const success = updateUserDetails(user.username, { password: newPassword });
-    if (success) {
-      toast({ title: "Password Updated", description: "Your password has been successfully changed." });
-      // Update local state to reflect change if password was stored in userDetails (it is for mock)
-      setUserDetails(prev => prev ? {...prev, password: newPassword} : null);
-      setCurrentPassword('');
-      setNewPassword('');
-      setConfirmNewPassword('');
-    } else {
-      setPasswordChangeError("Failed to update password. User not found or error saving.");
+      if (response.ok) {
+        toast({ title: "Password Updated", description: data?.message || "Your password has been successfully changed." });
+        setCurrentPassword('');
+        setNewPassword('');
+        setConfirmNewPassword('');
+      } else {
+        setPasswordChangeError(data?.message || `Failed to update password. Status: ${response.status}`);
+      }
+    } catch (error) {
+        console.error("Error updating password:", error);
+        setPasswordChangeError("An unexpected error occurred while updating your password.");
+    } finally {
+        setIsPasswordChanging(false);
     }
-    setIsPasswordChanging(false);
   };
 
   const handlePinChange = async (e: FormEvent) => {
@@ -93,49 +143,56 @@ export default function ProfilePage() {
       setPinChangeError("New PIN must be exactly 6 digits.");
       return;
     }
-    if (!user || !userDetails) return;
-
+    if (!user?.username) return;
+    
     setIsPinChanging(true);
-    await new Promise(resolve => setTimeout(resolve, 500));
+    try {
+        const response = await fetch('/api/user/update-pin', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'X-Mock-Username': user.username // For mock auth on API
+            },
+            body: JSON.stringify({ currentPin, newPin }),
+        });
 
-    if (userDetails.pin !== currentPin) {
-      setPinChangeError("Current PIN incorrect.");
-      setIsPinChanging(false);
-      return;
+        let data;
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+            data = await response.json();
+        }
+        
+        if (response.ok) {
+            toast({ title: "PIN Updated", description: data?.message || "Your PIN has been successfully changed." });
+            setCurrentPin('');
+            setNewPin('');
+            setConfirmNewPin('');
+        } else {
+            setPinChangeError(data?.message || `Failed to update PIN. Status: ${response.status}`);
+        }
+    } catch (error) {
+        console.error("Error updating PIN:", error);
+        setPinChangeError("An unexpected error occurred while updating your PIN.");
+    } finally {
+        setIsPinChanging(false);
     }
-
-    const success = updateUserDetails(user.username, { pin: newPin });
-    if (success) {
-      toast({ title: "PIN Updated", description: "Your PIN has been successfully changed." });
-      setUserDetails(prev => prev ? {...prev, pin: newPin} : null);
-      setCurrentPin('');
-      setNewPin('');
-      setConfirmNewPin('');
-    } else {
-      setPinChangeError("Failed to update PIN. User not found or error saving.");
-    }
-    setIsPinChanging(false);
   };
   
   const getDisplayPhoneNumber = () => {
-    if (!userDetails?.phoneNumber && !userDetails?.countryCode) {
+    if (!userDetails) return 'Loading...';
+    if (!userDetails.phoneNumber && !userDetails.countryCode) {
       return 'Not Provided';
     }
     
     let numberPart = userDetails.phoneNumber || '';
     const prefix = userDetails.countryCode || '';
-
-    // If phoneNumber from DB already starts with the stored countryCode (handles old format or manual entry)
-    // then strip the prefix from numberPart to avoid duplication
-    if (prefix && numberPart.startsWith(prefix)) {
-      numberPart = numberPart.substring(prefix.length).trim();
-    }
     
-    // Construct the display string, adding a space if both parts exist
+    // This logic assumes phone number from API/DB doesn't already include prefix
+    // If it might, further cleanup would be needed here.
     let displayPhone = prefix;
     if (prefix && numberPart) {
       displayPhone += ` ${numberPart}`;
-    } else if (numberPart) { // Only numberPart exists
+    } else if (numberPart) { 
       displayPhone = numberPart;
     }
     
@@ -156,7 +213,7 @@ export default function ProfilePage() {
     return (
       <Alert variant="destructive">
         <AlertTitle>Error Loading Profile</AlertTitle>
-        <AlertDescription>Could not load user profile details. Please try logging out and back in. If the issue persists, the user data might be missing or corrupted in local storage.</AlertDescription>
+        <AlertDescription>Could not load user profile details. Please try again or contact support if the issue persists.</AlertDescription>
       </Alert>
     );
   }
@@ -258,5 +315,3 @@ export default function ProfilePage() {
     </div>
   );
 }
-
-    

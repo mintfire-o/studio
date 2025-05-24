@@ -8,15 +8,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import type { MockStoredUser } from '@/types';
-import { Leaf, KeyRound, Fingerprint, Loader2, User, Mail, Phone, LogIn, AtSign } from 'lucide-react'; // Changed Palette to Leaf
+import { Leaf, KeyRound, Fingerprint, Loader2, User, Mail, Phone, LogIn, AtSign } from 'lucide-react'; 
 import Link from 'next/link';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { AnimatedBackground } from '@/components/animated-background';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-
-const MOCK_HARDCODED_TAKEN_USERNAMES = ['admin', 'root', 'superuser', 'testuser'];
-const MOCK_USERS_DB_KEY = 'laInteriorMockUsersDB';
 
 export default function CreateAccountPage() {
   const [fullName, setFullName] = useState('');
@@ -39,20 +35,6 @@ export default function CreateAccountPage() {
     return /^\d{10}$/.test(phone);
   };
 
-  const getMockUsersFromStorage = (): Record<string, MockStoredUser> => {
-    if (typeof window !== 'undefined') {
-      const storedUsers = localStorage.getItem(MOCK_USERS_DB_KEY);
-      return storedUsers ? JSON.parse(storedUsers) : {};
-    }
-    return {};
-  };
-
-  const saveMockUserToStorage = (users: Record<string, MockStoredUser>) => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(MOCK_USERS_DB_KEY, JSON.stringify(users));
-    }
-  };
-
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     setIsLoading(true);
@@ -68,14 +50,6 @@ export default function CreateAccountPage() {
       setIsLoading(false);
       return;
     }
-
-    const mockUsers = getMockUsersFromStorage();
-    if (MOCK_HARDCODED_TAKEN_USERNAMES.includes(username.toLowerCase()) || mockUsers[username.toLowerCase()]) {
-      setError(`Username "${username}" is already taken. Please choose another.`);
-      setIsLoading(false);
-      return;
-    }
-
     if (!isValidEmail(email)) {
       setError("Please enter a valid @gmail.com email address.");
       setIsLoading(false);
@@ -96,33 +70,47 @@ export default function CreateAccountPage() {
       setIsLoading(false);
       return;
     }
-
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
-    const newUserId = `user_${Date.now()}`;
-
-    const newUser: MockStoredUser = {
-      id: newUserId,
-      fullName,
-      username,
-      email,
-      phoneNumber: phoneNumber, 
-      countryCode: countryCode, 
-      password, 
-      pin,      
-    };
-
-    mockUsers[username.toLowerCase()] = newUser;
-    saveMockUserToStorage(mockUsers);
     
-    console.log('Mock Account Data saved to localStorage:', newUser);
+    try {
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fullName, username, email, countryCode, phoneNumber, password, pin }),
+      });
 
-    setIsLoading(false);
-    toast({
-      title: 'Account Created!',
-      description: 'Your account has been successfully created. Please proceed to login.',
-    });
-    router.push('/login');
+      let data;
+      const contentType = response.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        data = await response.json();
+      }
+
+      if (response.ok) {
+        toast({
+          title: 'Account Created!',
+          description: data?.message || 'Your account has been successfully created. Please proceed to login.',
+        });
+        router.push('/login');
+      } else {
+        const errorMessage = data?.message || `Account creation failed. Status: ${response.status}.`;
+        setError(errorMessage);
+        toast({
+            title: 'Creation Failed',
+            description: errorMessage,
+            variant: 'destructive',
+        });
+      }
+    } catch (e) {
+      console.error("Registration API call error:", e);
+      const errorMessage = e instanceof Error ? e.message : 'An unexpected error occurred during registration.';
+      setError(errorMessage);
+      toast({
+        title: 'Error',
+        description: errorMessage,
+        variant: 'destructive',
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -135,7 +123,7 @@ export default function CreateAccountPage() {
         <Card className="w-full max-w-md shadow-2xl z-10 transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-[0_0_35px_5px_hsl(var(--primary)/0.2)] bg-card/50 backdrop-blur-sm dark:bg-card/40">
           <CardHeader className="text-center">
             <div className="mx-auto mb-4">
-              <Leaf size={48} className="text-primary" /> {/* Changed Palette to Leaf */}
+              <Leaf size={48} className="text-primary" /> 
             </div>
             <CardTitle className="text-3xl font-bold">La Interior</CardTitle>
             <CardDescription>Create your account to start designing.</CardDescription>

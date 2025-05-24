@@ -43,6 +43,9 @@ body {
     --sidebar-accent-foreground: 40 80% 90%; /* Light contrast */
     --sidebar-border: 40 20% 80%; /* Similar to main border */
     --sidebar-ring: 45 70% 45%; /* Same as sidebar primary */
+
+    /* Neon Mint Leaf color */
+    --mint-neon: 150 70% 55%; 
   }
 
   .dark {
@@ -80,6 +83,9 @@ body {
     --sidebar-accent-foreground: 0 0% 10%; /* Dark contrast */
     --sidebar-border: 45 10% 20%; /* Similar to main border */
     --sidebar-ring: 48 80% 45%; /* Same as sidebar primary */
+
+    /* Neon Mint Leaf color for dark mode - can be the same or adjusted */
+    --mint-neon: 150 70% 60%; 
   }
 }
 
@@ -126,4 +132,13 @@ body {
   to {
     stroke-dashoffset: 0; /* Animate to fully drawn */
   }
+}
+
+/* Neon Mint Leaf Style */
+.neon-mint-leaf {
+  color: hsl(var(--mint-neon)); /* Sets the stroke color if the SVG uses currentColor */
+  fill: hsl(var(--mint-neon)); /* Explicitly set fill for compatibility */
+  filter: drop-shadow(0 0 2px hsl(var(--mint-neon) / 0.8)) /* Inner intense glow */
+          drop-shadow(0 0 6px hsl(var(--mint-neon) / 0.6)) /* Medium glow */
+          drop-shadow(0 0 12px hsl(var(--mint-neon) / 0.4)); /* Outer softer glow */
 }

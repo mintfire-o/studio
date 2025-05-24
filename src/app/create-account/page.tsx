@@ -85,26 +85,33 @@ export default function CreateAccountPage() {
       const contentType = response.headers.get("content-type");
       if (contentType && contentType.includes("application/json")) {
         data = await response.json();
-      } else if (!response.ok) {
+      } else {
         const text = await response.text();
         const errorMessage = `Account creation failed. Status: ${response.status}. Server response: ${text || 'No additional error message from server.'}`;
-        setError(errorMessage);
-        toast({
-            title: 'Creation Failed',
-            description: errorMessage,
-            variant: 'destructive',
-        });
-        setIsLoading(false);
-        return;
+         if (!response.ok) {
+            setError(errorMessage);
+            toast({
+                title: 'Creation Failed',
+                description: errorMessage,
+                variant: 'destructive',
+            });
+            setIsLoading(false);
+            return;
+        }
+        // If response.ok but not JSON, something is unexpected but might be non-fatal for this flow if message is present
+        console.warn("Registration API response was not JSON, but status was ok:", text);
+        data = { user: null, message: "Account created, but server response format was unexpected." }; 
       }
 
 
-      if (response.ok) {
+      if (response.ok && data?.user) {
         toast({
           title: 'Account Created!',
           description: data?.message || 'Your account has been successfully created. Logging you in...',
         });
+        // Automatically log the user in
         await auth.login({ username, password, pin } as FormData);
+        // AuthProvider will handle redirect to dashboard
       } else {
         const errorMessage = data?.message || `Account creation failed. Status: ${response.status}.`;
         setError(errorMessage);
@@ -145,7 +152,7 @@ export default function CreateAccountPage() {
         <Card className="w-full max-w-md shadow-2xl z-10 transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-[0_0_35px_5px_hsl(var(--primary)/0.2)] bg-card/50 backdrop-blur-sm dark:bg-card/40">
           <CardHeader className="text-center">
             <div className="mx-auto mb-4">
-              <Leaf size={48} className="text-primary" /> 
+              <Leaf size={48} className="neon-mint-leaf" /> 
             </div>
             <CardTitle className="text-3xl font-bold">La Interior</CardTitle>
             <CardDescription>Create your account to start designing.</CardDescription>

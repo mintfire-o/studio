@@ -4,14 +4,14 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Brain, History, Lightbulb, Users, CheckCircle, Linkedin, Github, Mail, Phone, MapPin, SquarePen, WandSparkles, CircleCheckBig, Globe, Leaf } from 'lucide-react';
+import { Brain, History, Lightbulb, Users, CheckCircle, Linkedin, Github, Mail, Phone, MapPin, SquarePen, WandSparkles, CircleCheckBig, Globe, Leaf, Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { AnimatedBackground } from '@/components/animated-background';
 import StylusTextAnimation from '@/components/stylus-text-animation';
 import React, { useEffect, useState } from 'react';
 import { generateInspirationImage, type GenerateInspirationImageOutput } from '@/ai/flows/generate-inspiration-image-flow';
-import { Loader2 } from 'lucide-react';
+
 
 const features = [
   {
@@ -63,7 +63,7 @@ const teamMembers = [
     role: "Founder\n\nCybersecurity Engineer | Blockchain Specialist | Bug Bounty Hunter",
     bio: "Skilled in vulnerability research, ethical hacking, and securing digital infrastructures. Passionate about advancing blockchain security, identifying threats, and building innovative security solutions.",
     image: "https://placehold.co/300x300.png",
-    hint: "man illustration", // Updated hint
+    hint: "man illustration",
     socials: {
       github: "https://github.com/avik-root", 
       linkedin: "https://www.linkedin.com/in/avik-samanta-root/",
@@ -120,6 +120,7 @@ const contactInfo = [
 
 export default function HomePage() {
   const [galleryImages, setGalleryImages] = useState<StaticGalleryImage[]>(initialStaticHomeGalleryImages);
+  // Removed AI image generation logic as per previous request for static images
 
   return (
     <>
@@ -236,13 +237,13 @@ export default function HomePage() {
               {teamMembers.map((member, index) => (
                 <Card key={index} className="text-center hover:shadow-xl transition-shadow duration-300 bg-card/80 backdrop-blur-sm">
                   <CardHeader>
-                    <div className="relative w-36 h-36 mx-auto mb-4 rounded-full overflow-hidden border-2 border-primary">
+                    <div className="relative w-36 h-36 mx-auto mb-4 rounded-lg p-0.5 bg-gradient-to-br from-primary to-accent shadow-lg">
                       <Image 
                         src={member.image} 
                         alt={member.name} 
                         width={144} 
                         height={144} 
-                        className="object-cover"
+                        className="object-cover w-full h-full rounded-md" // Slightly less rounding for inner image
                         data-ai-hint={member.hint}
                       />
                     </div>
@@ -260,7 +261,7 @@ export default function HomePage() {
                         </Link>
                       </Button>
                     )}
-                    {member.socials.linkedin && (
+                     {member.socials.linkedin && (
                       <Button variant="ghost" size="icon" asChild>
                         <Link href={member.socials.linkedin} target="_blank" rel="noopener noreferrer">
                           <Linkedin className="h-5 w-5 text-primary hover:text-primary/80" />

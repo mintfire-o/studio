@@ -2,11 +2,11 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Palette, Edit, Brain, History, Wand2, CheckCircle, Lightbulb, Users } from 'lucide-react';
+import { Brain, Wand2, Edit, History, Lightbulb, Users, CheckCircle } from 'lucide-react'; // Palette was removed as it's in StylusTextAnimation
 import Image from 'next/image';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { AnimatedBackground } from '@/components/animated-background';
-import StylusTextAnimation from '@/components/stylus-text-animation'; // Import the new component
+import StylusTextAnimation from '@/components/stylus-text-animation';
 
 export default function HomePage() {
   const features = [

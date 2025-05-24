@@ -107,7 +107,6 @@ export default function LoginPage() {
             </form>
           </CardContent>
           <CardFooter className="flex flex-col items-center text-center text-xs text-muted-foreground space-y-2 pt-6">
-            <p>Using mock user IDs for MVP. Try username: designer, password: password123, pin: 123456</p>
             <p>
               Don&apos;t have an account?{' '}
               <Button variant="link" className="p-0 h-auto text-xs" asChild>

@@ -1,12 +1,6 @@
 
 import type { User, FormData, MockStoredUser } from '@/types';
 
-// Mock user data - in a real app, this would come from a database.
-const MOCK_HARDCODED_USERS: Record<string, Partial<MockStoredUser>> = {
-  'designer': { id: 'user1', username: 'designer', password: 'password123', pin: '123456' },
-  'testuser': { id: 'user2', username: 'testuser', password: 'test', pin: '000000' },
-};
-
 const MOCK_USERS_DB_KEY = 'laInteriorMockUsersDB';
 
 const getMockUsersFromStorage = (): Record<string, MockStoredUser> => {
@@ -27,12 +21,8 @@ export async function mockLogin(credentials: FormData): Promise<User | null> {
     setTimeout(() => {
       const storedUsers = getMockUsersFromStorage();
       const usernameLower = credentials.username.toLowerCase();
-      let userToAuth: Partial<MockStoredUser> | undefined = storedUsers[usernameLower];
+      const userToAuth: MockStoredUser | undefined = storedUsers[usernameLower];
 
-      if (!userToAuth) { // Fallback to hardcoded users if not found in localStorage
-        userToAuth = MOCK_HARDCODED_USERS[usernameLower];
-      }
-      
       if (userToAuth && userToAuth.password === credentials.password && userToAuth.pin === credentials.pin) {
         // Return only non-sensitive User data
         resolve({ 

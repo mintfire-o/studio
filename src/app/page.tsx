@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Brain, Wand2, Edit, History, Lightbulb, Users, CheckCircle, Linkedin, Twitter, Mail, Phone, MapPin, SquarePen, WandSparkles, CircleCheckBig } from 'lucide-react';
+import { Brain, Wand2, Edit, History, Lightbulb, Users, CheckCircle, Linkedin, Twitter, Mail, Phone, MapPin, SquarePen, WandSparkles, CircleCheckBig, Globe } from 'lucide-react';
 import Image from 'next/image';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { AnimatedBackground } from '@/components/animated-background';
@@ -23,7 +23,7 @@ export default function HomePage() {
       hint: "color palette"
     },
     {
-      icon: <SquarePen className="h-10 w-10 text-accent mb-3" />, // Changed Edit to SquarePen
+      icon: <SquarePen className="h-10 w-10 text-accent mb-3" />, 
       title: "Virtual Wall Repaint",
       description: "Visualize new paint colors directly on your room's photo with our AI-powered repaint feature.",
       hint: "virtual interior"
@@ -232,6 +232,15 @@ export default function HomePage() {
               We&apos;d love to hear from you! Whether you have questions, feedback, or just want to say hello, feel free to reach out.
             </p>
             <div className="grid md:grid-cols-3 gap-8 text-left max-w-4xl mx-auto">
+              <Card className="flex flex-col items-center p-6 bg-card/80 backdrop-blur-sm hover:shadow-lg transition-shadow">
+                <Globe className="h-12 w-12 text-primary mb-4" />
+                <h3 className="text-xl font-semibold mb-2">Official Website</h3>
+                <p className="text-muted-foreground hover:text-primary transition-colors">
+                  <a href="https://mintfire.onrender.com/" target="_blank" rel="noopener noreferrer">
+                    mintfire.onrender.com
+                  </a>
+                </p>
+              </Card>
               <Card className="flex flex-col items-center p-6 bg-card/80 backdrop-blur-sm hover:shadow-lg transition-shadow">
                 <Mail className="h-12 w-12 text-primary mb-4" />
                 <h3 className="text-xl font-semibold mb-2">Email Us</h3>

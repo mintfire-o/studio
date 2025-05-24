@@ -67,7 +67,7 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      <Card className="mt-8 overflow-hidden">
+      <Card className="mt-8 overflow-hidden hover:shadow-xl transition-shadow duration-300">
         <CardHeader>
             <CardTitle className="text-2xl">Inspiration Gallery</CardTitle>
             <CardDescription>Get inspired by these beautiful room transformations.</CardDescription>

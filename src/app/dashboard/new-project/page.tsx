@@ -448,23 +448,36 @@ export default function NewProjectPage() {
                 <CardDescription>
                     {aiRepaintedImage.suggestion 
                         ? "AI-generated visualization of your room with the selected color. Further edits can be made by selecting a new color and running AI Repaint again." 
-                        : "This is a conceptual preview. Use AI Repaint tool to visualize colors on walls. The active color tint helps visualize if AI repaint is not used."
+                        : aiRepaintedImage.error
+                        ? "The AI repaint attempt failed. Displaying the original image. You can try the AI Repaint tool again, or use a different color/image."
+                        : "This is a conceptual preview of your original image. Use AI Repaint tool to visualize colors on walls. The active color tint helps visualize if AI repaint is not used yet."
                     }
                 </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
                 <div className="aspect-video relative w-full max-w-xl mx-auto rounded-lg overflow-hidden border shadow-lg bg-muted/20">
                     <NextImage src={currentPreviewImage} alt={projectName || "Room Preview"} layout="fill" objectFit="contain" />
-                    {/* Apply tint only if it's the original image and no AI repaint is loading or successful */}
-                    {activeColorForAiTools && !aiRepaintedImage.suggestion && !aiRepaintedImage.isLoading && (
+                    {/* Apply tint only if it's the original image AND no AI repaint is loading AND no AI repaint error occurred AND an active color is selected */}
+                    {activeColorForAiTools && !aiRepaintedImage.suggestion && !aiRepaintedImage.isLoading && !aiRepaintedImage.error && (
                         <div
                             style={{ backgroundColor: activeColorForAiTools }}
                             className="absolute inset-0 mix-blend-color pointer-events-none"
                         />
                     )}
                      {aiRepaintedImage.isLoading && (
-                        <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+                        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 text-background">
                             <Loader2 className="h-12 w-12 animate-spin text-primary" />
+                            <span className="mt-2 font-semibold">AI Repainting in Progress...</span>
+                            <span className="text-sm">This may take a moment.</span>
+                        </div>
+                    )}
+                    {/* Display error overlay if AI repaint failed and not currently loading a new attempt */}
+                    {aiRepaintedImage.error && !aiRepaintedImage.isLoading && (
+                         <div className="absolute inset-0 flex flex-col items-center justify-center bg-destructive/90 p-4 text-center">
+                            <XCircle className="h-10 w-10 text-destructive-foreground mb-2" />
+                            <p className="text-destructive-foreground font-bold text-lg">AI Repaint Failed</p>
+                            <p className="text-xs text-destructive-foreground/90 max-w-md overflow-y-auto max-h-20">{aiRepaintedImage.error}</p>
+                            <p className="text-xs text-destructive-foreground/90 mt-1">Showing original image. Please try a different color, image, or try again later.</p>
                         </div>
                     )}
                 </div>
@@ -477,7 +490,7 @@ export default function NewProjectPage() {
                         {aiPalette.suggestion && aiPalette.suggestion.length > 0 && !selectedColors.some(c => aiPalette.suggestion!.includes(c)) && (
                             <ColorPaletteDisplay colors={aiPalette.suggestion} title="AI Suggested Palette:" />
                         )}
-                         {activeColorForAiTools && !aiRepaintedImage.suggestion && (
+                         {activeColorForAiTools && !aiRepaintedImage.suggestion && !aiRepaintedImage.error && (
                             <p className="text-sm mt-2">
                                 Preview tinted with: <ColorSwatch color={activeColorForAiTools} size="sm" className="inline-block align-middle" /> <span style={{color: activeColorForAiTools, fontWeight: 'bold'}}>{activeColorForAiTools}</span>
                             </p>

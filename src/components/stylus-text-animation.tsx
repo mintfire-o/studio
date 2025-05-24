@@ -8,8 +8,6 @@ const StylusTextAnimation: React.FC = () => {
   return (
     <div className="flex flex-col items-center justify-center my-4">
       <style jsx global>{`
-        @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap');
-
         .stylus-text-svg {
           width: 100%;
           max-width: 400px; /* Adjust as needed */

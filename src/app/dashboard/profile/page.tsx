@@ -77,15 +77,16 @@ export default function ProfilePage() {
           }
         } catch (error) {
           console.error("Error fetching profile:", error);
+          let toastTitle = 'Network Error';
           let toastDescription = 'Failed to connect to the server to fetch profile details.';
           if (error instanceof TypeError && error.message.toLowerCase().includes('failed to fetch')) {
-            // Already specific enough from the catch block
+            toastDescription = 'Could not connect to the server. Please check your internet connection and try again.';
           } else if (error instanceof Error) {
             toastDescription = error.message;
           }
           toast({
             variant: 'destructive',
-            title: 'Network Error',
+            title: toastTitle,
             description: toastDescription,
           });
           setUserDetails(null);
@@ -150,8 +151,8 @@ export default function ProfilePage() {
       }
     } catch (error) {
         console.error("Error updating password:", error);
-        let errorMsg = "An unexpected error occurred while updating your password.";
         let toastTitle = 'Update Failed';
+        let errorMsg = "An unexpected error occurred while updating your password.";
         if (error instanceof TypeError && error.message.toLowerCase().includes('failed to fetch')) {
             toastTitle = 'Network Error';
             errorMsg = 'Could not connect to server to update password. Please check your internet connection.';
@@ -217,8 +218,8 @@ export default function ProfilePage() {
         }
     } catch (error) {
         console.error("Error updating PIN:", error);
-        let errorMsg = "An unexpected error occurred while updating your PIN.";
         let toastTitle = 'Update Failed';
+        let errorMsg = "An unexpected error occurred while updating your PIN.";
         if (error instanceof TypeError && error.message.toLowerCase().includes('failed to fetch')) {
             toastTitle = 'Network Error';
             errorMsg = 'Could not connect to server to update PIN. Please check your internet connection.';
@@ -309,7 +310,7 @@ export default function ProfilePage() {
       <Separator className="my-8" />
 
       <div className="grid md:grid-cols-2 gap-8">
-        <Card className="shadow-lg border-secondary/50">
+        <Card className="shadow-lg border-secondary/50 hover:shadow-xl hover:border-primary/50 transition-all duration-300 ease-in-out">
           <CardHeader>
             <CardTitle className="flex items-center text-xl">
               <KeyRound className="mr-2 h-6 w-6 text-secondary-foreground" /> Change Password
@@ -339,7 +340,7 @@ export default function ProfilePage() {
           </CardContent>
         </Card>
 
-        <Card className="shadow-lg border-accent/50">
+        <Card className="shadow-lg border-accent/50 hover:shadow-xl hover:border-primary/50 transition-all duration-300 ease-in-out">
           <CardHeader>
             <CardTitle className="flex items-center text-xl">
               <Fingerprint className="mr-2 h-6 w-6 text-accent-foreground" /> Change PIN

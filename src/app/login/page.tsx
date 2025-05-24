@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, type FormEvent } from 'react';
@@ -22,8 +23,9 @@ export default function LoginPage() {
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
-    const credentials: FormData = { username, password, pin };
-    await login(credentials);
+    // For login, we only need username, password, pin from the FormData type
+    const credentials: Pick<FormData, 'username' | 'password' | 'pin'> = { username, password, pin };
+    await login(credentials as FormData); // Cast for mockLogin, real API would differ
     // Navigation is handled by AuthProvider effect
   };
 
@@ -34,7 +36,7 @@ export default function LoginPage() {
       </div>
       <main className="relative flex items-center justify-center min-h-screen p-4 overflow-hidden">
         <AnimatedBackground />
-        <Card className="w-full max-w-md shadow-2xl z-10 transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-[0_0_35px_5px_hsl(var(--primary)/0.2)]">
+        <Card className="w-full max-w-md shadow-2xl z-10 transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-[0_0_35px_5px_hsl(var(--primary)/0.2)] bg-card/80 backdrop-blur-sm dark:bg-card/70">
           <CardHeader className="text-center">
             <div className="mx-auto mb-4">
               <Palette size={48} className="text-primary" />
@@ -83,7 +85,7 @@ export default function LoginPage() {
                     type="password" // Use password type to mask PIN
                     placeholder="••••••"
                     value={pin}
-                    onChange={(e) => setPin(e.target.value)}
+                    onChange={(e) => setPin(e.target.value.replace(/\D/g, ''))} // Allow only digits
                     maxLength={6}
                     pattern="\d{6}"
                     title="PIN must be 6 digits"

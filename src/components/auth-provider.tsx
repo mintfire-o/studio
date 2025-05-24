@@ -17,21 +17,22 @@ export interface AuthContextType {
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const MIN_LOADER_DURATION = 4500; 
+const MIN_LOADER_DURATION = 4500; // Duration of the stylus animation (4s + 0.5s delay)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true); 
-  const [isAuthReady, setIsAuthReady] = useState(false); 
+  const [isLoading, setIsLoading] = useState(true);
+  const [isAuthReady, setIsAuthReady] = useState(false); // Tracks if the initial auth check or login/logout process has finished
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const pathname = usePathname();
   const { toast } = useToast();
   const loadingStartTimeRef = useRef<number | null>(null);
 
+  // Effect for initial authentication check from localStorage
   useEffect(() => {
     loadingStartTimeRef.current = Date.now();
-    setIsLoading(true); 
+    setIsLoading(true);
     
     const storedUser = localStorage.getItem('laInteriorUser');
     if (storedUser) {
@@ -39,31 +40,51 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const parsedUser: User = JSON.parse(storedUser);
         setUser(parsedUser);
       } catch (e) {
+        console.error("Error parsing stored user:", e);
         localStorage.removeItem('laInteriorUser'); 
         setUser(null);
       }
     } else {
       setUser(null);
     }
-    setIsAuthReady(true); 
+    setIsAuthReady(true); // Initial auth status determined
   }, []);
 
+  // Effect to manage loading screen duration and hide it
   useEffect(() => {
-    if (isAuthReady) { 
-      const elapsedTime = Date.now() - (loadingStartTimeRef.current || Date.now());
-      const timeRemaining = MIN_LOADER_DURATION - elapsedTime;
+    let timeoutId: NodeJS.Timeout | undefined;
 
-      if (timeRemaining > 0) {
-        const timer = setTimeout(() => {
-          setIsLoading(false); 
-        }, timeRemaining);
-        return () => clearTimeout(timer);
+    if (isAuthReady) {
+      const now = Date.now();
+      // Ensure loadingStartTimeRef.current has a value, default to now if somehow null
+      const startTime = loadingStartTimeRef.current !== null ? loadingStartTimeRef.current : now;
+      const elapsedTime = now - startTime;
+      const timeToWait = MIN_LOADER_DURATION - elapsedTime;
+
+      if (timeToWait > 0) {
+        timeoutId = setTimeout(() => {
+          setIsLoading(false);
+        }, timeToWait);
       } else {
-        setIsLoading(false); 
+        // If MIN_LOADER_DURATION already passed, hide loader in the next microtask
+        Promise.resolve().then(() => setIsLoading(false));
+      }
+    } else {
+      // If auth is not ready yet (e.g. setIsAuthReady(false) was just called in login/logout)
+      // ensure isLoading is true.
+      if (!isLoading) {
+        setIsLoading(true);
       }
     }
-  }, [isAuthReady]);
 
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [isAuthReady, isLoading]); // Rerun when isAuthReady or isLoading changes to cover all scenarios
+
+  // Effect for handling navigation based on auth state
   useEffect(() => {
     if (!isLoading && isAuthReady) { 
       if (!user && pathname !== '/login' && pathname !== '/' && pathname !== '/create-account') {
@@ -75,9 +96,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [user, isLoading, isAuthReady, pathname, router]);
 
   const login = async (credentials: FormData) => {
-    loadingStartTimeRef.current = Date.now();
     setIsLoading(true); 
-    setIsAuthReady(false); 
+    loadingStartTimeRef.current = Date.now();
+    setIsAuthReady(false); // Indicate auth process is starting
     setError(null);
     try {
       const response = await fetch('/api/auth/login', {
@@ -90,7 +111,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const contentType = response.headers.get("content-type");
       if (contentType && contentType.includes("application/json")) {
         data = await response.json();
+      } else if (!response.ok) {
+        // Handle non-JSON error responses
+        throw new Error(data?.message || `Login failed. Status: ${response.status}. Please check your credentials or server response.`);
       }
+
 
       if (response.ok && data?.user) {
         const loggedInUser = data.user as User;
@@ -98,7 +123,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         localStorage.setItem('laInteriorUser', JSON.stringify(loggedInUser)); 
         toast({ title: 'Login Successful', description: `Welcome back, ${loggedInUser.username}!` });
       } else {
-        const errorMessage = data?.message || `Login failed. Status: ${response.status}. Please check your credentials.`;
+        const errorMessage = data?.message || `Login failed. Please check your credentials.`;
         setError(errorMessage);
         toast({ title: 'Login Failed', description: errorMessage, variant: 'destructive' });
         setUser(null); 
@@ -110,22 +135,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       toast({ title: 'Login Error', description: errorMessage, variant: 'destructive' });
       setUser(null);
     } finally {
-      setIsAuthReady(true); 
+      setIsAuthReady(true); // Auth process finished (success or fail)
     }
   };
 
   const logout = () => {
+    setIsLoading(true);
     loadingStartTimeRef.current = Date.now();
-    setIsLoading(true); 
-    setIsAuthReady(false); 
+    setIsAuthReady(false); // Indicate auth process is starting
     
     setUser(null);
     localStorage.removeItem('laInteriorUser');
+    // Note: Toasts might not be visible if immediate navigation occurs.
+    // Consider showing toast on the login page after redirect if needed.
     toast({ title: 'Logged Out', description: 'You have been successfully logged out.' });
     
-    setIsAuthReady(true); 
+    setIsAuthReady(true); // Auth process finished
   };
 
+  // Render loader if isLoading is true, otherwise render children
   if (isLoading) { 
     return (
       <div className="fixed inset-0 z-[70] flex flex-col items-center justify-center bg-background">
@@ -135,7 +163,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isLoading, error }}>
+    <AuthContext.Provider value={{ user, login, logout, isLoading: false, error }}>
       {children}
     </AuthContext.Provider>
   );

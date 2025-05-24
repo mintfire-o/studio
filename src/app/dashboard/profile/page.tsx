@@ -116,6 +116,32 @@ export default function ProfilePage() {
     }
     setIsPinChanging(false);
   };
+  
+  const getDisplayPhoneNumber = () => {
+    if (!userDetails?.phoneNumber && !userDetails?.countryCode) {
+      return 'Not Provided';
+    }
+    
+    let numberPart = userDetails.phoneNumber || '';
+    const prefix = userDetails.countryCode || '';
+
+    // If phoneNumber from DB already starts with the stored countryCode (handles old format or manual entry)
+    // then strip the prefix from numberPart to avoid duplication
+    if (prefix && numberPart.startsWith(prefix)) {
+      numberPart = numberPart.substring(prefix.length).trim();
+    }
+    
+    // Construct the display string, adding a space if both parts exist
+    let displayPhone = prefix;
+    if (prefix && numberPart) {
+      displayPhone += ` ${numberPart}`;
+    } else if (numberPart) { // Only numberPart exists
+      displayPhone = numberPart;
+    }
+    
+    return displayPhone.trim() || 'Not Provided';
+  };
+
 
   if (authLoading || isLoadingData) {
     return (
@@ -160,7 +186,7 @@ export default function ProfilePage() {
             </div>
             <div>
               <Label className="text-xs font-semibold text-muted-foreground tracking-wider uppercase">Phone Number</Label>
-              <p className="text-lg font-medium">{userDetails.phoneNumber ? `${userDetails.countryCode || ''} ${userDetails.phoneNumber}` : 'Not Provided'}</p>
+              <p className="text-lg font-medium">{getDisplayPhoneNumber()}</p>
             </div>
           </div>
         </CardContent>
@@ -232,3 +258,5 @@ export default function ProfilePage() {
     </div>
   );
 }
+
+    

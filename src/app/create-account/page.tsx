@@ -23,7 +23,7 @@ export default function CreateAccountPage() {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [countryCode, setCountryCode] = useState('+91');
-  const [phoneNumber, setPhoneNumber] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState(''); // This will store only the 10-digit number
   const [password, setPassword] = useState('');
   const [pin, setPin] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -100,7 +100,6 @@ export default function CreateAccountPage() {
     // Simulate API call / database save
     await new Promise(resolve => setTimeout(resolve, 1000));
 
-    const completePhoneNumber = `${countryCode}${phoneNumber}`;
     const newUserId = `user_${Date.now()}`;
 
     const newUser: MockStoredUser = {
@@ -108,8 +107,8 @@ export default function CreateAccountPage() {
       fullName,
       username,
       email,
-      phoneNumber: completePhoneNumber,
-      countryCode,
+      phoneNumber: phoneNumber, // Store only the 10-digit number
+      countryCode: countryCode, // Store the country code separately
       // IMPORTANT: In a real app, NEVER store passwords in plaintext.
       // This is only for mock purposes. Always hash passwords.
       password, 
@@ -283,3 +282,5 @@ export default function CreateAccountPage() {
     </>
   );
 }
+
+    

@@ -66,7 +66,7 @@ const teamMembers = [
     image: "https://placehold.co/300x300.png",
     hint: "person portrait",
     socials: {
-      linkedin: "#", // Add Anusha's LinkedIn URL here
+      linkedin: "#", 
       github: "#", 
     },
   },
@@ -241,17 +241,17 @@ export default function HomePage() {
                     <p className="text-muted-foreground text-sm whitespace-pre-line">{member.bio}</p>
                   </CardContent>
                   <CardFooter className="flex justify-center gap-4 pt-4">
-                    {member.socials.linkedin && (
-                      <Button variant="ghost" size="icon" asChild>
-                        <Link href={member.socials.linkedin} target="_blank" rel="noopener noreferrer">
-                          <Linkedin className="h-5 w-5 text-primary hover:text-primary/80" />
-                        </Link>
-                      </Button>
-                    )}
                     {member.socials.github && ( 
                       <Button variant="ghost" size="icon" asChild>
                         <Link href={member.socials.github} target="_blank" rel="noopener noreferrer">
                           <Github className="h-5 w-5 text-primary hover:text-primary/80" />
+                        </Link>
+                      </Button>
+                    )}
+                    {member.socials.linkedin && (
+                      <Button variant="ghost" size="icon" asChild>
+                        <Link href={member.socials.linkedin} target="_blank" rel="noopener noreferrer">
+                          <Linkedin className="h-5 w-5 text-primary hover:text-primary/80" />
                         </Link>
                       </Button>
                     )}
@@ -291,4 +291,3 @@ export default function HomePage() {
     </>
   );
 }
-

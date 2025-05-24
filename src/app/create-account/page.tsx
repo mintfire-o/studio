@@ -6,23 +6,51 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { useAuth } from '@/hooks/use-auth';
-import type { FormData } from '@/types';
-import { Palette, KeyRound, Fingerprint, Loader2, Home as HomeIcon } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import type { FormData } from '@/types'; // Using FormData for structure, though not sending all fields
+import { Palette, KeyRound, Fingerprint, Loader2, UserPlus, LogIn } from 'lucide-react';
 import Link from 'next/link';
 
-export default function LoginPage() {
+export default function CreateAccountPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [pin, setPin] = useState('');
-  const { login, isLoading, error: authError } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null); // For potential future validation errors
   const router = useRouter();
+  const { toast } = useToast();
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
-    const credentials: FormData = { username, password, pin };
-    await login(credentials);
-    // Navigation is handled by AuthProvider effect
+    setIsLoading(true);
+    setError(null);
+
+    // Basic frontend validation (example)
+    if (username.length < 3) {
+        setError("Username must be at least 3 characters long.");
+        setIsLoading(false);
+        return;
+    }
+    if (password.length < 6) {
+        setError("Password must be at least 6 characters long.");
+        setIsLoading(false);
+        return;
+    }
+    if (!/^\d{6}$/.test(pin)) {
+        setError("PIN must be exactly 6 digits.");
+        setIsLoading(false);
+        return;
+    }
+
+    // Simulate account creation API call
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    setIsLoading(false);
+    toast({
+      title: 'Account Created (Mock)',
+      description: 'Your account has been successfully created. Please proceed to login.',
+    });
+    router.push('/login');
   };
 
   return (
@@ -33,18 +61,18 @@ export default function LoginPage() {
             <Palette size={48} className="text-primary" />
           </div>
           <CardTitle className="text-3xl font-bold">ColorVisionary</CardTitle>
-          <CardDescription>Sign in to unlock your creative vision.</CardDescription>
+          <CardDescription>Create your account to start designing.</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
               <Label htmlFor="username">Username</Label>
               <div className="relative">
-                <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                <UserPlus className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                 <Input
                   id="username"
                   type="text"
-                  placeholder="e.g., designer"
+                  placeholder="Choose a username"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   required
@@ -59,7 +87,7 @@ export default function LoginPage() {
                 <Input
                   id="password"
                   type="password"
-                  placeholder="••••••••"
+                  placeholder="Create a strong password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -73,36 +101,31 @@ export default function LoginPage() {
                  <Fingerprint className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                 <Input
                   id="pin"
-                  type="password" // Use password type to mask PIN
-                  placeholder="••••••"
+                  type="password" 
+                  placeholder="Set your 6-digit PIN"
                   value={pin}
                   onChange={(e) => setPin(e.target.value)}
                   maxLength={6}
                   pattern="\d{6}"
                   title="PIN must be 6 digits"
                   required
-                  className="pl-10 tracking-[0.3em]" // For better PIN appearance
+                  className="pl-10 tracking-[0.3em]"
                 />
               </div>
             </div>
-            {authError && <p className="text-sm text-destructive text-center">{authError}</p>}
+            {error && <p className="text-sm text-destructive text-center">{error}</p>}
             <Button type="submit" className="w-full text-lg py-3" disabled={isLoading}>
-              {isLoading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : 'Sign In'}
-            </Button>
-            <Button variant="outline" className="w-full" asChild>
-              <Link href="/">
-                <HomeIcon className="mr-2 h-4 w-4" />
-                Back to Home
-              </Link>
+              {isLoading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : 'Create Account'}
             </Button>
           </form>
         </CardContent>
-        <CardFooter className="flex flex-col items-center text-center text-xs text-muted-foreground space-y-2 pt-6">
-          <p>Using mock user IDs for MVP. Try username: designer, password: password123, pin: 123456</p>
+        <CardFooter className="text-center text-sm text-muted-foreground pt-6">
           <p>
-            Don&apos;t have an account?{' '}
-            <Button variant="link" className="p-0 h-auto text-xs" asChild>
-                <Link href="/create-account">Create one</Link>
+            Already have an account?{' '}
+            <Button variant="link" className="p-0 h-auto text-sm" asChild>
+              <Link href="/login">
+                <LogIn className="mr-1 h-4 w-4" /> Sign In
+              </Link>
             </Button>
           </p>
         </CardFooter>

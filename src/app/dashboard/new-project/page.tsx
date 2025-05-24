@@ -14,7 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 import { generateColorPalette, type GenerateColorPaletteInput, type GenerateColorPaletteOutput } from '@/ai/flows/generate-color-palette';
 import { suggestPaintSheen, type SuggestPaintSheenInput, type SuggestPaintSheenOutput } from '@/ai/flows/suggest-paint-sheen';
 import { suggestComplementaryColors, type SuggestComplementaryColorsInput, type SuggestComplementaryColorsOutput } from '@/ai/flows/suggest-complementary-colors';
-import { Loader2, Wand2, Sparkles, Save, Image as ImageIcon, Palette } from 'lucide-react';
+import { Loader2, Wand2, Sparkles, Save, Image as ImageIcon, Palette, XCircle } from 'lucide-react';
 import NextImage from 'next/image';
 
 const initialAiSuggestionState = { suggestion: null, reasoning: '', isLoading: false, error: null };

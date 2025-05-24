@@ -14,58 +14,82 @@ import { useState, useEffect, useCallback } from 'react';
 type ThemeMode = 'light' | 'dark' | 'system';
 
 export function ThemeToggle() {
+  // selectedMode is the user's *preference* (light, dark, system)
   const [selectedMode, setSelectedMode] = useState<ThemeMode>('system');
+  // triggerIcon reflects the *effective* theme (sun, moon, or laptop for system if not yet resolved)
   const [triggerIcon, setTriggerIcon] = useState<React.ReactNode>(<Laptop className="h-5 w-5" />);
 
-  const updateEffectiveThemeIcon = useCallback((effectiveMode: 'light' | 'dark') => {
-    if (effectiveMode === 'light') {
-      setTriggerIcon(<Sun className="h-5 w-5" />);
-    } else {
+  // Function to update the visual icon based on the effective theme
+  const updateIconBasedOnEffectiveTheme = useCallback(() => {
+    const isCurrentlyDark = document.documentElement.classList.contains('dark');
+    const currentPreference = localStorage.getItem('theme-preference') as ThemeMode | null || 'system';
+
+    if (currentPreference === 'system') {
+        setTriggerIcon(<Laptop className="h-5 w-5" />);
+    } else if (isCurrentlyDark) {
       setTriggerIcon(<Moon className="h-5 w-5" />);
+    } else {
+      setTriggerIcon(<Sun className="h-5 w-5" />);
     }
   }, []);
 
-  const applyThemePreference = useCallback((mode: ThemeMode) => {
-    localStorage.setItem('theme-preference', mode);
-    const root = window.document.documentElement;
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    let isDarkActive: boolean;
-
-    if (mode === 'system') {
-      isDarkActive = mediaQuery.matches;
-    } else {
-      isDarkActive = mode === 'dark';
-    }
-    root.classList.toggle('dark', isDarkActive);
-    updateEffectiveThemeIcon(isDarkActive ? 'dark' : 'light');
-  }, [updateEffectiveThemeIcon]);
-
+  // Effect 1: Initialize selectedMode from localStorage and set up system theme listener
   useEffect(() => {
     const storedPreference = localStorage.getItem('theme-preference') as ThemeMode | null;
-    const initialMode = storedPreference || 'system';
-    setSelectedMode(initialMode);
-    // applyThemePreference(initialMode); // Called by selectedMode effect
+    const initialUserPreference = storedPreference || 'system';
+    setSelectedMode(initialUserPreference); // This triggers Effect 2
 
+    // Listener for system theme changes
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const systemThemeChangeListener = () => {
-      // If the user has 'system' selected, re-apply based on new system preference
+    const handleSystemThemeChange = (e: MediaQueryListEvent) => {
       if (localStorage.getItem('theme-preference') === 'system') {
-         applyThemePreference('system');
+        if (e.matches) {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+        updateIconBasedOnEffectiveTheme(); // Update icon when system theme changes and preference is 'system'
       }
     };
 
-    mediaQuery.addEventListener('change', systemThemeChangeListener);
-    return () => mediaQuery.removeEventListener('change', systemThemeChangeListener);
-  }, [applyThemePreference]); // applyThemePreference will be stable due to useCallback
+    mediaQuery.addEventListener('change', handleSystemThemeChange);
+    
+    // Initial icon update after ensuring selectedMode is set
+    // This will be more accurate after Effect 2 has run for the initial selectedMode
+    // updateIconBasedOnEffectiveTheme(); 
 
-  // This effect applies theme when selectedMode changes (e.g. user clicks an option or on initial load)
+    return () => mediaQuery.removeEventListener('change', handleSystemThemeChange);
+  }, [updateIconBasedOnEffectiveTheme]);
+
+
+  // Effect 2: Apply theme when user's *preference* (selectedMode) changes, or on initial load via setSelectedMode.
   useEffect(() => {
-    applyThemePreference(selectedMode);
-  }, [selectedMode, applyThemePreference]);
+    const root = document.documentElement;
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+    // Always store the current preference
+    localStorage.setItem('theme-preference', selectedMode);
+
+    if (selectedMode === 'light') {
+      root.classList.remove('dark');
+    } else if (selectedMode === 'dark') {
+      root.classList.add('dark');
+    } else { // selectedMode === 'system'
+      // For system, rely on the media query for the actual class.
+      // The inline script handles initial state. The listener (in Effect 1) handles changes.
+      if (mediaQuery.matches) {
+        root.classList.add('dark');
+      } else {
+        root.classList.remove('dark');
+      }
+    }
+    // After class is set by preference, update the icon
+    updateIconBasedOnEffectiveTheme();
+  }, [selectedMode, updateIconBasedOnEffectiveTheme]);
 
 
   const handleSetMode = (mode: ThemeMode) => {
-    setSelectedMode(mode);
+    setSelectedMode(mode); // This will trigger Effect 2
   };
 
   return (

@@ -1,3 +1,4 @@
+
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
@@ -27,6 +28,36 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                function getInitialTheme() {
+                  try {
+                    const preference = localStorage.getItem('theme-preference');
+                    if (preference === 'dark') return 'dark';
+                    if (preference === 'light') return 'light';
+                    // If 'system' or no preference, check system
+                    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                      return 'dark';
+                    }
+                  } catch (e) {
+                    // Fallback for environments where localStorage isn't available
+                  }
+                  return 'light'; // Default to light
+                }
+                const theme = getInitialTheme();
+                if (theme === 'dark') {
+                  document.documentElement.classList.add('dark');
+                } else {
+                  document.documentElement.classList.remove('dark');
+                }
+              })();
+            `,
+          }}
+        />
+      </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <AuthProvider>
           <ProjectProvider>

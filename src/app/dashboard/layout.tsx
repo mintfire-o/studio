@@ -58,11 +58,8 @@ export default function DashboardLayout({
           </Button>
         ))}
       </nav>
-      <div className="mt-auto p-4 space-y-2 border-t border-border">
-        {/* <Button variant="ghost" className="w-full justify-start text-base">
-          <Settings className="mr-3 h-5 w-5" />
-          Settings
-        </Button> */}
+      {/* Sign Out button is now in the header for desktop, kept here for mobile sheet consistency if needed or can be removed */}
+      <div className="mt-auto p-4 space-y-2 border-t border-border md:hidden"> 
         <Button variant="ghost" onClick={logout} className="w-full justify-start text-base text-destructive hover:text-destructive hover:bg-destructive/10">
           <LogOut className="mr-3 h-5 w-5" />
           Sign Out
@@ -98,17 +95,37 @@ export default function DashboardLayout({
              <span>La Interior</span>
            </Link>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 sm:gap-4">
           <span className="text-sm text-muted-foreground hidden sm:inline">
             Welcome, {user?.username}
           </span>
           <ThemeToggle />
+          <Button variant="ghost" onClick={logout} size="icon" className="hidden md:inline-flex text-muted-foreground hover:text-destructive hover:bg-destructive/10">
+            <LogOut className="h-5 w-5" />
+            <span className="sr-only">Sign Out</span>
+          </Button>
         </div>
       </header>
       
       <div className="flex flex-1 md:grid md:grid-cols-[260px_1fr]">
         <aside className="hidden md:flex h-full max-h-screen flex-col border-r bg-background shadow-inner">
-           <NavContent />
+           {/* NavContent for desktop sidebar still includes navigation, but sign out is primarily in header */}
+           <nav className="flex-grow space-y-2 px-2 py-4">
+            {navItems.map((item) => (
+              <Button
+                key={item.href}
+                asChild
+                variant={pathname === item.href ? 'secondary' : 'ghost'}
+                className="w-full justify-start text-base"
+              >
+                <Link href={item.href}>
+                  <item.icon className="mr-3 h-5 w-5" />
+                  {item.label}
+                </Link>
+              </Button>
+            ))}
+          </nav>
+          {/* Optional: could add user profile/settings link here if needed */}
         </aside>
         <main className="flex-1 p-4 sm:p-6 lg:p-8 bg-background md:bg-secondary/30 dark:md:bg-muted/10 overflow-y-auto">
           {children}

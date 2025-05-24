@@ -29,17 +29,20 @@ export function ProjectCard({ project, onDelete }: ProjectCardProps) {
     year: 'numeric', month: 'long', day: 'numeric'
   });
 
+  // Preferentially display the AI repainted image if available
+  const displayImageUrl = project.aiRepaintedPhotoDataUri || project.roomPhotoUrl;
+
   return (
     <Card className="flex flex-col h-full overflow-hidden transition-shadow hover:shadow-xl">
       <CardHeader>
         <div className="aspect-video relative w-full rounded-t-lg overflow-hidden mb-2">
           <Image 
-            src={project.roomPhotoUrl} 
+            src={displayImageUrl} 
             alt={project.name} 
             layout="fill" 
             objectFit="cover" 
             className="transition-transform duration-300 group-hover:scale-105"
-            data-ai-hint="interior room"
+            data-ai-hint={project.aiRepaintedPhotoDataUri ? "repainted room" : "interior room"}
           />
         </div>
         <CardTitle className="text-xl">{project.name}</CardTitle>
@@ -62,7 +65,6 @@ export function ProjectCard({ project, onDelete }: ProjectCardProps) {
       </CardContent>
       <CardFooter className="grid grid-cols-2 gap-2 border-t pt-4">
         <Button asChild variant="outline">
-          {/* In a full app, this would link to /dashboard/project/[id]/edit or similar */}
           <Link href={`/dashboard/new-project?projectId=${project.id}`}> 
             <Edit3 className="mr-2 h-4 w-4" /> View/Edit
           </Link>
@@ -92,3 +94,4 @@ export function ProjectCard({ project, onDelete }: ProjectCardProps) {
     </Card>
   );
 }
+

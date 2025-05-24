@@ -2,7 +2,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -15,36 +15,73 @@ import { useToast } from '@/hooks/use-toast';
 import { generateColorPalette, type GenerateColorPaletteInput, type GenerateColorPaletteOutput } from '@/ai/flows/generate-color-palette';
 import { suggestPaintSheen, type SuggestPaintSheenInput, type SuggestPaintSheenOutput } from '@/ai/flows/suggest-paint-sheen';
 import { suggestComplementaryColors, type SuggestComplementaryColorsInput, type SuggestComplementaryColorsOutput } from '@/ai/flows/suggest-complementary-colors';
-import { Loader2, Wand2, Sparkles, Save, Image as ImageIcon, Palette, XCircle } from 'lucide-react';
+import { repaintWall, type RepaintWallInput, type RepaintWallOutput } from '@/ai/flows/repaint-wall-flow';
+import { Loader2, Wand2, Sparkles, Save, Image as ImageIcon, Palette, XCircle, Paintbrush } from 'lucide-react';
 import NextImage from 'next/image';
 
-const initialAiSuggestionState = { suggestion: null, reasoning: '', isLoading: false, error: null };
 
 export default function NewProjectPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const projectId = searchParams.get('projectId');
+  const { addProject, getProjectById, updateProject } = useProjects();
+  const { toast } = useToast();
+
   const [projectName, setProjectName] = useState('');
-  const [roomPhoto, setRoomPhoto] = useState<{ name: string; dataUrl: string } | null>(null);
+  const [roomPhoto, setRoomPhoto] = useState<{ name: string; dataUrl: string } | null>(null); // Original uploaded photo
   const [manualColor, setManualColor] = useState<string>('#FFFFFF');
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
   
   const [aiPalette, setAiPalette] = useState<AISuggestion<string[]>>({ suggestion: [], reasoning: '', isLoading: false, error: null });
   const [aiSheen, setAiSheen] = useState<AISuggestion<string>>({ suggestion: '', reasoning: '', isLoading: false, error: null });
   const [aiComplementary, setAiComplementary] = useState<AISuggestion<string[]>>({ suggestion: [], reasoning: '', isLoading: false, error: null });
+  const [aiRepaintedImage, setAiRepaintedImage] = useState<AISuggestion<string | null>>({ suggestion: null, reasoning: '', isLoading: false, error: null });
+
 
   const [activeColorForAiTools, setActiveColorForAiTools] = useState<string | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
 
-  const { addProject } = useProjects();
-  const router = useRouter();
-  const { toast } = useToast();
+
+  useEffect(() => {
+    if (projectId) {
+      const projectToEdit = getProjectById(projectId);
+      if (projectToEdit) {
+        setIsEditing(true);
+        setProjectName(projectToEdit.name);
+        setRoomPhoto({ name: 'Uploaded room image', dataUrl: projectToEdit.originalPhotoDataUri });
+        setSelectedColors(projectToEdit.selectedColors);
+        if (projectToEdit.aiSuggestedPalette) setAiPalette(projectToEdit.aiSuggestedPalette);
+        if (projectToEdit.sheenSuggestion) setAiSheen(projectToEdit.sheenSuggestion);
+        if (projectToEdit.complementaryColorsSuggestion) setAiComplementary(projectToEdit.complementaryColorsSuggestion);
+        if (projectToEdit.aiRepaintedPhotoDataUri) {
+          setAiRepaintedImage({ suggestion: projectToEdit.aiRepaintedPhotoDataUri, reasoning: 'Previously repainted by AI.', isLoading: false, error: null });
+        }
+        // Set first selected color as active, or first from AI palette if no manual ones.
+        if (projectToEdit.selectedColors.length > 0) {
+            setActiveColorForAiTools(projectToEdit.selectedColors[0]);
+        } else if (projectToEdit.aiSuggestedPalette?.suggestion && projectToEdit.aiSuggestedPalette.suggestion.length > 0) {
+            setActiveColorForAiTools(projectToEdit.aiSuggestedPalette.suggestion[0]);
+        }
+      } else {
+        toast({ title: "Error", description: "Project not found.", variant: "destructive" });
+        router.push('/dashboard/history');
+      }
+    }
+  }, [projectId, getProjectById, toast, router]);
+
 
   const handleFileUpload = (fileData: { name: string; dataUrl: string }) => {
     if(fileData.dataUrl) {
       setRoomPhoto(fileData);
-      // Reset AI suggestions if new image is uploaded
-      setAiPalette({ suggestion: [], reasoning: '', isLoading: false, error: null });
-      setAiSheen({ suggestion: '', reasoning: '', isLoading: false, error: null });
-      setAiComplementary({ suggestion: [], reasoning: '', isLoading: false, error: null });
-      setSelectedColors([]);
-      setActiveColorForAiTools(null);
+      // Reset AI suggestions if new image is uploaded, unless editing
+      if (!isEditing) {
+        setAiPalette({ suggestion: [], reasoning: '', isLoading: false, error: null });
+        setAiSheen({ suggestion: '', reasoning: '', isLoading: false, error: null });
+        setAiComplementary({ suggestion: [], reasoning: '', isLoading: false, error: null });
+        setAiRepaintedImage({ suggestion: null, reasoning: '', isLoading: false, error: null });
+        setSelectedColors([]);
+        setActiveColorForAiTools(null);
+      }
     } else {
       setRoomPhoto(null);
     }
@@ -83,9 +120,6 @@ export default function NewProjectPage() {
       const input: GenerateColorPaletteInput = { photoDataUri: roomPhoto.dataUrl };
       const result = await generateColorPalette(input);
       setAiPalette({ suggestion: result.palette, reasoning: 'AI generated palette based on your image.', isLoading: false, error: null });
-      // Optionally auto-select the first color or add palette to selectedColors
-      // setSelectedColors(result.palette);
-      // if (result.palette.length > 0) setActiveColorForAiTools(result.palette[0]);
       toast({ title: 'AI Palette Generated!', description: 'Review the suggested colors.' });
     } catch (error) {
       console.error('Error generating palette:', error);
@@ -133,6 +167,25 @@ export default function NewProjectPage() {
     }
   };
 
+  const callAiRepaintWall = async () => {
+    if (!roomPhoto?.dataUrl || !activeColorForAiTools) {
+      toast({ title: 'Error', description: 'Please upload a room photo and select an active color first.', variant: 'destructive' });
+      return;
+    }
+    setAiRepaintedImage(prev => ({ ...prev, isLoading: true, error: null, suggestion: null }));
+    try {
+      const input: RepaintWallInput = { originalPhotoDataUri: roomPhoto.dataUrl, selectedColorHex: activeColorForAiTools };
+      const result = await repaintWall(input);
+      setAiRepaintedImage({ suggestion: result.repaintedImageDataUri, reasoning: 'AI repainted image based on your selection.', isLoading: false, error: null });
+      toast({ title: 'AI Wall Repaint Successful!', description: 'The preview has been updated with the AI-generated image.' });
+    } catch (error) {
+      console.error('Error repainting wall with AI:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to repaint wall with AI.';
+      setAiRepaintedImage({ suggestion: null, reasoning: '', isLoading: false, error: errorMessage });
+      toast({ title: 'AI Repaint Error', description: errorMessage, variant: 'destructive' });
+    }
+  };
+
 
   const handleSaveProject = () => {
     if (!projectName) {
@@ -144,19 +197,27 @@ export default function NewProjectPage() {
       return;
     }
 
-    const newProject: Project = {
-      id: Date.now().toString(), // Simple ID generation
+    const projectData: Project = {
+      id: isEditing && projectId ? projectId : Date.now().toString(),
       name: projectName,
-      roomPhotoUrl: roomPhoto.dataUrl, // For display, might be a remote URL in a real app
-      originalPhotoDataUri: roomPhoto.dataUrl, // For AI processing
+      // roomPhotoUrl will be the one to display: repainted if available, else original
+      roomPhotoUrl: aiRepaintedImage.suggestion || roomPhoto.dataUrl, 
+      originalPhotoDataUri: roomPhoto.dataUrl,
+      aiRepaintedPhotoDataUri: aiRepaintedImage.suggestion || null,
       selectedColors,
       aiSuggestedPalette: aiPalette.suggestion && aiPalette.suggestion.length > 0 ? aiPalette : null,
       sheenSuggestion: aiSheen.suggestion ? aiSheen : null,
       complementaryColorsSuggestion: aiComplementary.suggestion && aiComplementary.suggestion.length > 0 ? aiComplementary : null,
-      createdAt: new Date().toISOString(),
+      createdAt: isEditing && projectId ? getProjectById(projectId)!.createdAt : new Date().toISOString(),
     };
-    addProject(newProject);
-    toast({ title: 'Project Saved!', description: `"${projectName}" has been added to your history.` });
+
+    if (isEditing) {
+        updateProject(projectData);
+        toast({ title: 'Project Updated!', description: `"${projectName}" has been successfully updated.` });
+    } else {
+        addProject(projectData);
+        toast({ title: 'Project Saved!', description: `"${projectName}" has been added to your history.` });
+    }
     router.push('/dashboard/history');
   };
   
@@ -167,12 +228,19 @@ export default function NewProjectPage() {
     </Button>
   );
 
+  const currentPreviewImage = aiRepaintedImage.suggestion || roomPhoto?.dataUrl;
+
   return (
     <div className="space-y-8">
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl flex items-center gap-2"><ImageIcon className="h-6 w-6 text-primary" /> Create New Project</CardTitle>
-          <CardDescription>Upload an image of your room and start designing.</CardDescription>
+          <CardTitle className="text-2xl flex items-center gap-2">
+            <ImageIcon className="h-6 w-6 text-primary" /> 
+            {isEditing ? 'Edit Project' : 'Create New Project'}
+          </CardTitle>
+          <CardDescription>
+            {isEditing ? 'Update the details of your project.' : 'Upload an image of your room and start designing.'}
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <div>
@@ -265,7 +333,23 @@ export default function NewProjectPage() {
               <CardTitle className="text-xl flex items-center gap-2"><Wand2 className="h-5 w-5 text-primary" />AI Assistant Tools</CardTitle>
               {!activeColorForAiTools && <CardDescription>Select a color from your palette to activate these tools.</CardDescription>}
             </CardHeader>
-            <CardContent className="space-y-6">
+            <CardContent className="space-y-4">
+              <AiToolButton 
+                onClick={callAiRepaintWall}
+                isLoading={aiRepaintedImage.isLoading}
+                icon={Paintbrush}
+                label="AI Repaint Wall with Active Color"
+                disabled={!activeColorForAiTools || !roomPhoto?.dataUrl}
+              />
+              {aiRepaintedImage.error && <p className="text-sm text-destructive">{aiRepaintedImage.error}</p>}
+               {aiRepaintedImage.isLoading && (
+                <div className="flex items-center justify-center text-muted-foreground">
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <span>AI is repainting the image... (this may take a moment)</span>
+                </div>
+              )}
+
+
               <AiToolButton 
                 onClick={callSuggestSheen} 
                 isLoading={aiSheen.isLoading} 
@@ -306,20 +390,31 @@ export default function NewProjectPage() {
         </div>
       )}
       
-      {roomPhoto?.dataUrl && (
+      {currentPreviewImage && (
         <Card>
             <CardHeader>
                 <CardTitle className="text-xl">Project Preview</CardTitle>
-                <CardDescription>This is a conceptual preview. Actual color replacement on image is an advanced feature. The active color tint helps visualize.</CardDescription>
+                <CardDescription>
+                    {aiRepaintedImage.suggestion 
+                        ? "AI-generated visualization of your room with the selected color. Further edits can be made by selecting a new color and running AI Repaint again." 
+                        : "This is a conceptual preview. Use AI Repaint tool to visualize colors on walls. The active color tint helps visualize if AI repaint is not used."
+                    }
+                </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
                 <div className="aspect-video relative w-full max-w-xl mx-auto rounded-lg overflow-hidden border shadow-lg bg-muted/20">
-                    <NextImage src={roomPhoto.dataUrl} alt={projectName || "Room Preview"} layout="fill" objectFit="contain" />
-                    {activeColorForAiTools && (
+                    <NextImage src={currentPreviewImage} alt={projectName || "Room Preview"} layout="fill" objectFit="contain" />
+                    {/* Apply tint only if it's the original image and no AI repaint is loading or successful */}
+                    {activeColorForAiTools && !aiRepaintedImage.suggestion && !aiRepaintedImage.isLoading && (
                         <div
                             style={{ backgroundColor: activeColorForAiTools }}
                             className="absolute inset-0 mix-blend-color pointer-events-none"
                         />
+                    )}
+                     {aiRepaintedImage.isLoading && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+                            <Loader2 className="h-12 w-12 animate-spin text-primary" />
+                        </div>
                     )}
                 </div>
                 {(selectedColors.length > 0 || (aiPalette.suggestion && aiPalette.suggestion.length > 0)) && (
@@ -331,11 +426,16 @@ export default function NewProjectPage() {
                         {aiPalette.suggestion && aiPalette.suggestion.length > 0 && !selectedColors.some(c => aiPalette.suggestion!.includes(c)) && (
                             <ColorPaletteDisplay colors={aiPalette.suggestion} title="AI Suggested Palette:" />
                         )}
-                         {activeColorForAiTools && (
+                         {activeColorForAiTools && !aiRepaintedImage.suggestion && (
                             <p className="text-sm mt-2">
                                 Preview tinted with: <ColorSwatch color={activeColorForAiTools} size="sm" className="inline-block align-middle" /> <span style={{color: activeColorForAiTools, fontWeight: 'bold'}}>{activeColorForAiTools}</span>
                             </p>
                         )}
+                         {aiRepaintedImage.suggestion && activeColorForAiTools && (
+                             <p className="text-sm mt-2">
+                                AI Repainted with: <ColorSwatch color={activeColorForAiTools} size="sm" className="inline-block align-middle" /> <span style={{color: activeColorForAiTools, fontWeight: 'bold'}}>{activeColorForAiTools}</span>
+                            </p>
+                         )}
                     </div>
                 )}
             </CardContent>
@@ -347,10 +447,11 @@ export default function NewProjectPage() {
         <div className="mt-8 flex justify-end">
           <Button size="lg" onClick={handleSaveProject} className="text-lg">
             <Save className="mr-2 h-5 w-5" />
-            Save Project
+            {isEditing ? 'Update Project' : 'Save Project'}
           </Button>
         </div>
       )}
     </div>
   );
 }
+

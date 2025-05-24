@@ -14,8 +14,9 @@ export interface AISuggestion<T> {
 export interface Project {
   id: string;
   name: string;
-  roomPhotoUrl: string; // Data URI or uploaded file URL
-  originalPhotoDataUri: string; // Base64 data URI for AI
+  roomPhotoUrl: string; // Data URI or uploaded file URL - this will be the primary display image
+  originalPhotoDataUri: string; // Base64 data URI for AI processing (original upload)
+  aiRepaintedPhotoDataUri?: string | null; // Data URI of AI-repainted image
   selectedColors: string[]; // hex codes
   aiSuggestedPalette: AISuggestion<string[]> | null;
   sheenSuggestion: AISuggestion<string> | null;
@@ -29,3 +30,4 @@ export interface FormData {
   password?: string; // Optional for now
   pin?: string; // Optional for now
 }
+

@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -14,7 +15,7 @@ export default function DashboardPage() {
     <div className="space-y-8">
       <div className="bg-card p-6 rounded-lg shadow-lg">
         <h1 className="text-3xl font-bold tracking-tight text-primary">
-          Welcome to ColorVisionary, {user?.username}!
+          Welcome to La Interior, {user?.username}!
         </h1>
         <p className="text-muted-foreground mt-2 text-lg">
           Ready to transform your space? Let's get started.

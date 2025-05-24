@@ -76,12 +76,12 @@ export default function HomePage() {
       icon: <Globe className="h-12 w-12 text-primary mb-4" />,
       title: (
         <a href="https://mintfire.onrender.com/" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
-          Official Website
+          MintFire
         </a>
       ),
       details: (
         <a href="https://mintfire.onrender.com/" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors text-sm">
-          mintfire.onrender.com
+          Official Website
         </a>
       ),
     },
@@ -279,7 +279,7 @@ export default function HomePage() {
                   {typeof item.details === 'string' ? (
                     <p className="text-muted-foreground text-center">{item.details.split('<br />').map((line, i) => <React.Fragment key={i}>{line}{i < item.details.split('<br />').length - 1 && <br />}</React.Fragment>)}</p>
                   ) : (
-                    <p className="text-muted-foreground text-center"> {/* Removed hover from p, let <a> handle it */}
+                    <p className="text-muted-foreground text-center">
                       {item.details}
                     </p>
                   )}

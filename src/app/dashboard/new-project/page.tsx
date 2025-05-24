@@ -9,14 +9,15 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { FileUpload } from '@/components/file-upload';
 import { ColorPaletteDisplay, ColorSwatch } from '@/components/color-swatch';
-import type { Project, AISuggestion } from '@/types';
+import type { Project, AISuggestion, DetectedWallColor, AIWallColorSuggestion } from '@/types';
 import { useProjects } from '@/contexts/project-context';
 import { useToast } from '@/hooks/use-toast';
 import { generateColorPalette, type GenerateColorPaletteInput, type GenerateColorPaletteOutput } from '@/ai/flows/generate-color-palette';
 import { suggestPaintSheen, type SuggestPaintSheenInput, type SuggestPaintSheenOutput } from '@/ai/flows/suggest-paint-sheen';
 import { suggestComplementaryColors, type SuggestComplementaryColorsInput, type SuggestComplementaryColorsOutput } from '@/ai/flows/suggest-complementary-colors';
 import { repaintWall, type RepaintWallInput, type RepaintWallOutput } from '@/ai/flows/repaint-wall-flow';
-import { Loader2, Wand2, Sparkles, Save, Image as ImageIcon, Palette, XCircle, Paintbrush } from 'lucide-react';
+import { detectWallColor, type DetectWallColorInput, type DetectWallColorOutput } from '@/ai/flows/detect-wall-color-flow';
+import { Loader2, Wand2, Sparkles, Save, Image as ImageIcon, Palette, XCircle, Paintbrush, SearchCode } from 'lucide-react';
 import NextImage from 'next/image';
 
 
@@ -36,6 +37,7 @@ export default function NewProjectPage() {
   const [aiSheen, setAiSheen] = useState<AISuggestion<string>>({ suggestion: '', reasoning: '', isLoading: false, error: null });
   const [aiComplementary, setAiComplementary] = useState<AISuggestion<string[]>>({ suggestion: [], reasoning: '', isLoading: false, error: null });
   const [aiRepaintedImage, setAiRepaintedImage] = useState<AISuggestion<string | null>>({ suggestion: null, reasoning: '', isLoading: false, error: null });
+  const [aiDetectedWallColors, setAiDetectedWallColors] = useState<AIWallColorSuggestion>({ suggestion: [], reasoning: '', isLoading: false, error: null });
 
 
   const [activeColorForAiTools, setActiveColorForAiTools] = useState<string | null>(null);
@@ -53,6 +55,7 @@ export default function NewProjectPage() {
         if (projectToEdit.aiSuggestedPalette) setAiPalette(projectToEdit.aiSuggestedPalette);
         if (projectToEdit.sheenSuggestion) setAiSheen(projectToEdit.sheenSuggestion);
         if (projectToEdit.complementaryColorsSuggestion) setAiComplementary(projectToEdit.complementaryColorsSuggestion);
+        if (projectToEdit.aiDetectedWallColors) setAiDetectedWallColors(projectToEdit.aiDetectedWallColors);
         if (projectToEdit.aiRepaintedPhotoDataUri) {
           setAiRepaintedImage({ suggestion: projectToEdit.aiRepaintedPhotoDataUri, reasoning: 'Previously repainted by AI.', isLoading: false, error: null });
         }
@@ -79,6 +82,7 @@ export default function NewProjectPage() {
         setAiSheen({ suggestion: '', reasoning: '', isLoading: false, error: null });
         setAiComplementary({ suggestion: [], reasoning: '', isLoading: false, error: null });
         setAiRepaintedImage({ suggestion: null, reasoning: '', isLoading: false, error: null });
+        setAiDetectedWallColors({ suggestion: [], reasoning: '', isLoading: false, error: null });
         setSelectedColors([]);
         setActiveColorForAiTools(null);
       }
@@ -125,6 +129,25 @@ export default function NewProjectPage() {
       console.error('Error generating palette:', error);
       const errorMessage = error instanceof Error ? error.message : 'Failed to generate palette.';
       setAiPalette({ suggestion: [], reasoning: '', isLoading: false, error: errorMessage });
+      toast({ title: 'AI Error', description: errorMessage, variant: 'destructive' });
+    }
+  };
+
+  const callDetectWallColor = async () => {
+    if (!roomPhoto?.dataUrl) {
+      toast({ title: 'Error', description: 'Please upload a room photo first.', variant: 'destructive' });
+      return;
+    }
+    setAiDetectedWallColors(prev => ({ ...prev, isLoading: true, error: null }));
+    try {
+      const input: DetectWallColorInput = { photoDataUri: roomPhoto.dataUrl };
+      const result = await detectWallColor(input);
+      setAiDetectedWallColors({ suggestion: result.wallColors, reasoning: result.reasoning, isLoading: false, error: null });
+      toast({ title: 'AI Wall Colors Detected!', description: 'Review the detected wall colors.' });
+    } catch (error) {
+      console.error('Error detecting wall colors:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to detect wall colors.';
+      setAiDetectedWallColors({ suggestion: [], reasoning: '', isLoading: false, error: errorMessage });
       toast({ title: 'AI Error', description: errorMessage, variant: 'destructive' });
     }
   };
@@ -208,6 +231,7 @@ export default function NewProjectPage() {
       aiSuggestedPalette: aiPalette.suggestion && aiPalette.suggestion.length > 0 ? aiPalette : null,
       sheenSuggestion: aiSheen.suggestion ? aiSheen : null,
       complementaryColorsSuggestion: aiComplementary.suggestion && aiComplementary.suggestion.length > 0 ? aiComplementary : null,
+      aiDetectedWallColors: aiDetectedWallColors.suggestion && aiDetectedWallColors.suggestion.length > 0 ? aiDetectedWallColors : null,
       createdAt: isEditing && projectId ? getProjectById(projectId)!.createdAt : new Date().toISOString(),
     };
 
@@ -309,6 +333,33 @@ export default function NewProjectPage() {
                   {activeColorForAiTools && <p className="text-xs mt-1 text-primary">Active for AI tools: <span style={{color: activeColorForAiTools, fontWeight: 'bold'}}>{activeColorForAiTools}</span></p>}
                 </div>
               )}
+              <div className="space-y-2">
+                <AiToolButton 
+                    onClick={callDetectWallColor} 
+                    isLoading={aiDetectedWallColors.isLoading} 
+                    icon={SearchCode} 
+                    label="AI Detect Wall Color(s)" 
+                />
+                {aiDetectedWallColors.error && <p className="text-sm text-destructive">{aiDetectedWallColors.error}</p>}
+                {aiDetectedWallColors.suggestion && aiDetectedWallColors.suggestion.length > 0 && (
+                    <div>
+                        <h4 className="text-sm font-medium text-muted-foreground mt-2">AI Detected Wall Colors (Click to select):</h4>
+                        <div className="flex flex-wrap gap-2">
+                        {aiDetectedWallColors.suggestion.map((detected, index) => (
+                            <ColorSwatch 
+                                key={`${detected.hex}-${index}`} 
+                                color={detected.hex}
+                                label={detected.name}
+                                onClick={() => handleColorSelectFromPalette(detected.hex)}
+                                isSelected={activeColorForAiTools === detected.hex}
+                                showCopyButton
+                            />
+                        ))}
+                        </div>
+                        {aiDetectedWallColors.reasoning && <p className="text-xs text-muted-foreground mt-1">{aiDetectedWallColors.reasoning}</p>}
+                    </div>
+                )}
+              </div>
 
               <AiToolButton 
                 onClick={callGeneratePalette} 

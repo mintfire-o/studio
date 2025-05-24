@@ -11,6 +11,16 @@ export interface AISuggestion<T> {
   error?: string | null;
 }
 
+export interface DetectedWallColor {
+  hex: string;
+  name: string;
+}
+
+export interface AIWallColorSuggestion extends AISuggestion<DetectedWallColor[]> {
+  // suggestion will be an array of DetectedWallColor
+}
+
+
 export interface Project {
   id: string;
   name: string;
@@ -21,6 +31,7 @@ export interface Project {
   aiSuggestedPalette: AISuggestion<string[]> | null;
   sheenSuggestion: AISuggestion<string> | null;
   complementaryColorsSuggestion: AISuggestion<string[]> | null;
+  aiDetectedWallColors?: AIWallColorSuggestion | null; // Added for detected wall colors
   createdAt: string; // ISO date string
 }
 

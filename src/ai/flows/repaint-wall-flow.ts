@@ -49,14 +49,14 @@ const repaintWallFlow = ai.defineFlow(
       prompt: [
         {media: {url: input.originalPhotoDataUri}},
         {
-          text: `You are an expert interior design AI. Your task is to repaint the main walls in the provided room image using a specific color.
-The user wants to see how it would look if the main walls were painted with the color ${input.selectedColorHex}.
+          text: `You are an expert interior design AI. Your task is to repaint the large, primary wall surfaces in the provided room image using a specific color.
+The user wants to see how it would look if these walls were painted with the color ${input.selectedColorHex}.
 
 Instructions:
-1. Analyze the provided image to identify the primary wall surfaces.
-2. Generate a new image of the *exact same room*, preserving all furniture, decor, windows, lighting, shadows, and overall room structure as accurately as possible.
-3. The *only* significant change should be that the main wall surfaces are now painted with the color ${input.selectedColorHex}.
-4. Maintain realistic lighting, shadows, and textures consistent with the original image as if the walls were actually repainted with the new color.
+1. Analyze the provided image to identify the most prominent, large wall surfaces that would typically be painted (e.g., excluding small accent areas unless they are the clear focus, trim, or areas primarily covered by large fixtures). These are the 'target walls'.
+2. Generate a new image of the *exact same room*, preserving all furniture, decor, windows, lighting, shadows, and overall room structure as accurately as possible. Non-target wall surfaces should also remain unchanged.
+3. The *only* significant change should be that the 'target walls' are now painted with the color ${input.selectedColorHex}.
+4. Maintain realistic lighting, shadows, and textures on the repainted walls, consistent with the original image and the new color.
 5. Output *only* the repainted image. Do not include any descriptive text unless the image generation fails. If you cannot perform the repaint accurately, explain why in text and do not generate an image.`,
         },
       ],

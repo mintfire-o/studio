@@ -17,7 +17,7 @@ export interface AuthContextType {
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const MIN_LOADER_DURATION = 2000; 
+const MIN_LOADER_DURATION = 4600; // Updated to 4.6 seconds
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -63,9 +63,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setIsLoading(false);
         }, timeToWait);
       } else {
+        // Ensure isLoading is set to false in a microtask to avoid potential race conditions
+        // or direct state update during render if elapsedTime already exceeds MIN_LOADER_DURATION.
         Promise.resolve().then(() => setIsLoading(false));
       }
     } else {
+      // If auth is not ready yet, ensure loader stays active
       if (!isLoading) {
         setIsLoading(true);
       }
@@ -76,7 +79,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         clearTimeout(timeoutId);
       }
     };
-  }, [isAuthReady, isLoading]); 
+  }, [isAuthReady, isLoading]); // Added isLoading to dependencies to re-evaluate if it's externally set.
 
   useEffect(() => {
     if (!isLoading && isAuthReady) { 
@@ -104,15 +107,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const contentType = response.headers.get("content-type");
       if (contentType && contentType.includes("application/json")) {
         data = await response.json();
-      } else if (!response.ok) {
-        // Handle non-JSON error responses or unexpected content types
+      } else {
         const text = await response.text();
         const errorMessage = `Login failed. Status: ${response.status}. Server response: ${text || 'No additional error message from server.'}`;
-        setError(errorMessage);
-        toast({ title: 'Login Failed', description: errorMessage, variant: 'destructive' });
-        setUser(null);
-        setIsAuthReady(true);
-        return;
+         if (!response.ok) {
+            setError(errorMessage);
+            toast({ title: 'Login Failed', description: errorMessage, variant: 'destructive' });
+            setUser(null);
+            setIsAuthReady(true);
+            return;
+        }
+        // If response.ok but not JSON, something is unexpected
+        console.warn("Login API response was not JSON, but status was ok:", text);
+        data = { user: null, message: "Login successful, but server response format was unexpected." }; 
       }
 
 

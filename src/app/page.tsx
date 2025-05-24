@@ -1,13 +1,38 @@
 
+'use client'; // This page uses client-side hooks for image fetching
+
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Brain, History, Lightbulb, Users, CheckCircle, Linkedin, Github, Mail, Phone, MapPin, SquarePen, WandSparkles, CircleCheckBig, Globe } from 'lucide-react'; // Updated Twitter to Github
+import { Brain, History, Lightbulb, Users, CheckCircle, Linkedin, Github, Mail, Phone, MapPin, SquarePen, WandSparkles, CircleCheckBig, Globe, Loader2, AlertTriangle } from 'lucide-react';
 import Image from 'next/image';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { AnimatedBackground } from '@/components/animated-background';
 import StylusTextAnimation from '@/components/stylus-text-animation';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { generateInspirationImage } from '@/ai/flows/generate-inspiration-image-flow';
+
+interface InspirationImageState {
+  id: string;
+  src: string;
+  alt: string;
+  hint: string;
+  prompt: string;
+  isLoading: boolean;
+  error?: string | null;
+}
+
+const initialHomeGalleryPrompts = [
+  { id: 'home-living-room', prompt: "A luxurious modern living room with velvet sofas, gold accents, and a city view through large windows", alt: "Luxurious Modern Living Room", hint: "living room modern" },
+  { id: 'home-bedroom', prompt: "A serene minimalist bedroom with neutral tones, natural light, and simple wooden furniture", alt: "Serene Minimalist Bedroom", hint: "bedroom minimalist" },
+  { id: 'home-kitchen', prompt: "A rustic farmhouse kitchen with an island, exposed wooden beams, and vintage appliances", alt: "Rustic Farmhouse Kitchen", hint: "kitchen farmhouse" },
+  { id: 'home-office', prompt: "A bright and creative home office with colorful artwork, an ergonomic setup, and plenty of natural light", alt: "Creative Home Office", hint: "office creative" },
+  { id: 'home-dining', prompt: "An elegant contemporary dining room with a statement chandelier, dark wood table, and plush chairs", alt: "Elegant Dining Room", hint: "dining elegant" },
+  { id: 'home-patio', prompt: "A cozy outdoor patio with string lights, comfortable seating, and lush greenery", alt: "Cozy Outdoor Patio", hint: "patio outdoor" },
+];
+
+const FALLBACK_IMAGE_SRC = "https://placehold.co/600x400.png";
+
 
 export default function HomePage() {
   const features = [
@@ -37,14 +62,39 @@ export default function HomePage() {
     }
   ];
 
-  const galleryImages = [
-    { src: "https://placehold.co/600x400.png", alt: "Elegant Living Room", hint: "living room elegant" },
-    { src: "https://placehold.co/600x400.png", alt: "Serene Bedroom Oasis", hint: "bedroom serene" },
-    { src: "https://placehold.co/600x400.png", alt: "Modern Minimalist Kitchen", hint: "kitchen modern" },
-    { src: "https://placehold.co/600x400.png", alt: "Vibrant Home Office", hint: "office vibrant" },
-    { src: "https://placehold.co/600x400.png", alt: "Cozy Reading Nook", hint: "reading nook cozy" },
-    { src: "https://placehold.co/600x400.png", alt: "Chic Dining Area", hint: "dining chic" },
-  ];
+  const [galleryImages, setGalleryImages] = useState<InspirationImageState[]>(
+    initialHomeGalleryPrompts.map(p => ({ ...p, src: '', isLoading: true, error: null }))
+  );
+
+  useEffect(() => {
+    const fetchImages = async () => {
+      for (const promptItem of initialHomeGalleryPrompts) {
+        try {
+          const result = await generateInspirationImage({ prompt: promptItem.prompt });
+          setGalleryImages(prev =>
+            prev.map(img =>
+              img.id === promptItem.id
+                ? { ...img, src: result.imageDataUri, isLoading: false, error: null }
+                : img
+            )
+          );
+        } catch (err) {
+          console.error(`Failed to generate image for prompt "${promptItem.prompt}":`, err);
+          const errorMessage = err instanceof Error ? err.message : "Failed to load image";
+          setGalleryImages(prev =>
+            prev.map(img =>
+              img.id === promptItem.id
+                ? { ...img, src: FALLBACK_IMAGE_SRC, isLoading: false, error: errorMessage }
+                : img
+            )
+          );
+        }
+      }
+    };
+
+    fetchImages();
+  }, []);
+
 
   const teamMembers = [
     {
@@ -55,7 +105,7 @@ export default function HomePage() {
       hint: "person portrait",
       socials: {
         linkedin: "https://www.linkedin.com/in/avik-samanta-05766a192/",
-        github: "https://github.com/avksamanta", // Changed from twitter
+        github: "https://github.com/avksamanta", 
       },
     },
     {
@@ -66,7 +116,7 @@ export default function HomePage() {
       hint: "person portrait",
       socials: {
         linkedin: "#",
-        github: "#", // Changed from twitter
+        github: "#", 
       },
     },
   ];
@@ -190,19 +240,42 @@ export default function HomePage() {
           <div className="container mx-auto">
             <h2 className="text-3xl font-bold text-center mb-12 text-primary">Inspiration Gallery</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {galleryImages.map((img, idx) => (
-                    <div key={idx} className="rounded-lg overflow-hidden shadow-lg aspect-video relative group border-2 border-primary/30 hover:border-primary transition-all duration-300">
-                        <Image 
-                            src={img.src} 
-                            alt={img.alt} 
-                            width={600} 
-                            height={400} 
-                            className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-110"
-                            data-ai-hint={img.hint}
-                        />
-                         <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                            <p className="text-white font-semibold text-lg">{img.alt}</p>
-                        </div>
+                {galleryImages.map((img) => (
+                    <div key={img.id} className="rounded-lg overflow-hidden shadow-lg aspect-video relative group border-2 border-primary/30 hover:border-primary transition-all duration-300 bg-muted/50">
+                        {img.isLoading ? (
+                          <div className="absolute inset-0 flex flex-col items-center justify-center text-muted-foreground">
+                            <Loader2 className="h-12 w-12 animate-spin text-primary" />
+                            <p className="mt-2 text-sm">Generating...</p>
+                          </div>
+                        ) : img.error ? (
+                          <div className="absolute inset-0 flex flex-col items-center justify-center text-destructive p-4 text-center">
+                            <AlertTriangle className="h-10 w-10 mb-2" />
+                            <p className="text-sm font-semibold">Image Error</p>
+                            <p className="text-xs">{img.error.length > 100 ? img.error.substring(0,100) + '...' : img.error }</p>
+                            <Image 
+                                src={FALLBACK_IMAGE_SRC} 
+                                alt={img.alt + " (Fallback)"}
+                                width={600} 
+                                height={400} 
+                                className="object-cover w-full h-full opacity-20"
+                                data-ai-hint={img.hint}
+                            />
+                          </div>
+                        ) : (
+                          <>
+                            <Image 
+                                src={img.src} 
+                                alt={img.alt} 
+                                width={600} 
+                                height={400} 
+                                className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-110"
+                                data-ai-hint={img.hint}
+                            />
+                             <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                <p className="text-white font-semibold text-lg">{img.alt}</p>
+                            </div>
+                          </>
+                        )}
                     </div>
                 ))}
             </div>
@@ -246,7 +319,7 @@ export default function HomePage() {
                         </Link>
                       </Button>
                     )}
-                    {member.socials.github && ( // Changed from twitter
+                    {member.socials.github && ( 
                       <Button variant="ghost" size="icon" asChild>
                         <Link href={member.socials.github} target="_blank" rel="noopener noreferrer">
                           <Github className="h-5 w-5 text-primary hover:text-primary/80" />
@@ -273,7 +346,7 @@ export default function HomePage() {
                   {item.icon}
                   <h3 className="text-xl font-semibold mb-2">{item.title}</h3>
                   {typeof item.details === 'string' ? (
-                    <p className="text-muted-foreground text-center">{item.details.split('<br />').map((line, i) => <React.Fragment key={i}>{line}{i < item.details.split('<br />').length - 1 && <br />}</React.Fragment>)}</p>
+                    <p className="text-muted-foreground text-center" dangerouslySetInnerHTML={{ __html: item.details }} />
                   ) : (
                     <div className="text-muted-foreground text-center">
                       {item.details}
@@ -289,4 +362,3 @@ export default function HomePage() {
     </>
   );
 }
-

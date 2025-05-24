@@ -1,6 +1,8 @@
+
 export interface User {
   id: string;
-  username: string;
+  username: string; // This might represent full name after account creation for mock purposes
+  email?: string;
   // In a real app, never store raw PINs or passwords
 }
 
@@ -35,10 +37,13 @@ export interface Project {
   createdAt: string; // ISO date string
 }
 
-// Simplified for MVP
+// FormData for both login and create account (mock)
 export interface FormData {
-  username: string;
-  password?: string; // Optional for now
-  pin?: string; // Optional for now
+  username: string; // Used for full name in creation, username in login
+  email?: string;
+  phoneNumber?: string;
+  password?: string;
+  pin?: string;
 }
 
+    

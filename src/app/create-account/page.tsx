@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, type FormEvent } from 'react';
@@ -7,43 +8,76 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import type { FormData } from '@/types'; 
-import { Palette, KeyRound, Fingerprint, Loader2, UserPlus, LogIn } from 'lucide-react';
+import type { FormData } from '@/types';
+import { Palette, KeyRound, Fingerprint, Loader2, User, Mail, Phone, LogIn } from 'lucide-react';
 import Link from 'next/link';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { AnimatedBackground } from '@/components/animated-background';
 
 export default function CreateAccountPage() {
-  const [username, setUsername] = useState('');
+  const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [password, setPassword] = useState('');
   const [pin, setPin] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null); 
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const { toast } = useToast();
+
+  const isValidEmail = (email: string) => {
+    // Basic email validation
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
+
+  const isValidPhoneNumber = (phone: string) => {
+    // Basic phone validation (e.g., 10 digits)
+    return /^\d{10}$/.test(phone);
+  };
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     setIsLoading(true);
     setError(null);
 
-    if (username.length < 3) {
-        setError("Username must be at least 3 characters long.");
-        setIsLoading(false);
-        return;
+    if (fullName.length < 3) {
+      setError("Full Name must be at least 3 characters long.");
+      setIsLoading(false);
+      return;
+    }
+    if (!isValidEmail(email)) {
+      setError("Please enter a valid email address.");
+      setIsLoading(false);
+      return;
+    }
+    if (!isValidPhoneNumber(phoneNumber)) {
+      setError("Phone Number must be 10 digits.");
+      setIsLoading(false);
+      return;
     }
     if (password.length < 6) {
-        setError("Password must be at least 6 characters long.");
-        setIsLoading(false);
-        return;
+      setError("Password must be at least 6 characters long.");
+      setIsLoading(false);
+      return;
     }
     if (!/^\d{6}$/.test(pin)) {
-        setError("PIN must be exactly 6 digits.");
-        setIsLoading(false);
-        return;
+      setError("PIN must be exactly 6 digits.");
+      setIsLoading(false);
+      return;
     }
 
+    // Simulate API call / database save
     await new Promise(resolve => setTimeout(resolve, 1000));
+
+    // Mock data collected:
+    const accountData: Partial<FormData> = {
+      username: fullName, // Storing fullName in username for mock purposes
+      email,
+      phoneNumber,
+      password, // In a real app, password would be hashed
+      pin,      // In a real app, PIN would be handled securely
+    };
+    console.log('Mock Account Data to be saved:', accountData);
 
     setIsLoading(false);
     toast({
@@ -69,30 +103,66 @@ export default function CreateAccountPage() {
             <CardDescription>Create your account to start designing.</CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="username">Username</Label>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-1">
+                <Label htmlFor="fullName">Full Name</Label>
                 <div className="relative">
-                  <UserPlus className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                   <Input
-                    id="username"
+                    id="fullName"
                     type="text"
-                    placeholder="Choose a username"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
+                    placeholder="Enter your full name"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
                     required
                     className="pl-10 hover:border-primary/50 focus:border-primary transition-colors duration-300"
                   />
                 </div>
               </div>
-              <div className="space-y-2">
+
+              <div className="space-y-1">
+                <Label htmlFor="email">Email</Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="Enter your email address"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    className="pl-10 hover:border-primary/50 focus:border-primary transition-colors duration-300"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <Label htmlFor="phoneNumber">Phone Number</Label>
+                <div className="relative">
+                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                  <Input
+                    id="phoneNumber"
+                    type="tel"
+                    placeholder="Enter your 10-digit phone number"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    maxLength={10}
+                    pattern="\d{10}"
+                    title="Phone number must be 10 digits"
+                    required
+                    className="pl-10 hover:border-primary/50 focus:border-primary transition-colors duration-300"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1">
                 <Label htmlFor="password">Password</Label>
                 <div className="relative">
                   <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                   <Input
                     id="password"
                     type="password"
-                    placeholder="Create a strong password"
+                    placeholder="Create a strong password (min. 6 characters)"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
@@ -100,13 +170,14 @@ export default function CreateAccountPage() {
                   />
                 </div>
               </div>
-              <div className="space-y-2">
+
+              <div className="space-y-1">
                 <Label htmlFor="pin">6-Digit PIN</Label>
                 <div className="relative">
                    <Fingerprint className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                   <Input
                     id="pin"
-                    type="password" 
+                    type="password"
                     placeholder="Set your 6-digit PIN"
                     value={pin}
                     onChange={(e) => setPin(e.target.value)}
@@ -118,13 +189,13 @@ export default function CreateAccountPage() {
                   />
                 </div>
               </div>
-              {error && <p className="text-sm text-destructive text-center">{error}</p>}
-              <Button type="submit" className="w-full text-lg py-3 transition-all duration-300 ease-in-out hover:shadow-lg transform hover:scale-[1.02]" disabled={isLoading}>
+              {error && <p className="text-sm text-destructive text-center pt-2">{error}</p>}
+              <Button type="submit" className="w-full text-lg py-3 mt-6 transition-all duration-300 ease-in-out hover:shadow-lg transform hover:scale-[1.02]" disabled={isLoading}>
                 {isLoading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : 'Create Account'}
               </Button>
             </form>
           </CardContent>
-          <CardFooter className="text-center text-sm text-muted-foreground pt-6">
+          <CardFooter className="text-center text-sm text-muted-foreground pt-4">
             <p>
               Already have an account?{' '}
               <Button variant="link" className="p-0 h-auto text-sm" asChild>
@@ -139,3 +210,5 @@ export default function CreateAccountPage() {
     </>
   );
 }
+
+    

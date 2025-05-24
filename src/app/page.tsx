@@ -122,11 +122,11 @@ export default function HomePage() {
   ];
 
   const contactInfo = [
-    {
+     {
       icon: <Globe className="h-12 w-12 text-primary mb-4" />,
       title: "MintFire",
       details: (
-        <a href="https://mintfire.onrender.com/" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors text-sm">
+        <a href="https://mintfire.onrender.com/" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
           Official Website
         </a>
       ),
@@ -135,8 +135,8 @@ export default function HomePage() {
       icon: <Mail className="h-12 w-12 text-primary mb-4" />,
       title: "Email Us",
       details: (
-        <a href="mailto:hello@mintfire.dev" className="hover:text-primary transition-colors">
-          hello@mintfire.dev
+        <a href="mailto:mintfire.server@gmail.com" className="hover:text-primary transition-colors">
+          mintfire.server@gmail.com
         </a>
       ),
     },
@@ -144,15 +144,15 @@ export default function HomePage() {
       icon: <Phone className="h-12 w-12 text-primary mb-4" />,
       title: "Call Us",
       details: (
-        <a href="tel:+11234567890" className="hover:text-primary transition-colors">
-          (123) 456-7890
+        <a href="tel:+916200000020" className="hover:text-primary transition-colors">
+          +91 62XXX XXX20
         </a>
       ),
     },
     {
       icon: <MapPin className="h-12 w-12 text-primary mb-4" />,
       title: "Our Office",
-      details: "123 MintFire Street<br />Design City, DC 12345",
+      details: "Kolkata, Remote",
     },
   ];
 

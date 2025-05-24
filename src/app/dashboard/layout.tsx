@@ -19,6 +19,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import StylusTextAnimation from '@/components/stylus-text-animation'; // Import the animation
 
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: Home },
@@ -39,8 +40,8 @@ export default function DashboardLayout({
 
   if (authLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-background">
-        <Palette className="h-12 w-12 animate-pulse text-primary" />
+      <div className="flex flex-col items-center justify-center min-h-screen bg-background">
+        <StylusTextAnimation />
       </div>
     );
   }

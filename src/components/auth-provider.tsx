@@ -1,3 +1,4 @@
+
 'use client';
 
 import type { User, FormData } from '@/types';
@@ -5,6 +6,7 @@ import { mockLogin } from '@/lib/mock-auth';
 import { useRouter, usePathname } from 'next/navigation';
 import React, { createContext, useState, useEffect, type ReactNode } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import StylusTextAnimation from '@/components/stylus-text-animation'; // Import the animation
 
 export interface AuthContextType {
   user: User | null;
@@ -74,6 +76,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     toast({ title: 'Logged Out', description: 'You have been successfully logged out.' });
     router.push('/login');
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-background">
+        <StylusTextAnimation />
+      </div>
+    );
+  }
 
   return (
     <AuthContext.Provider value={{ user, login, logout, isLoading, error }}>

@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Brain, Wand2, Edit, History, Lightbulb, Users, CheckCircle, Linkedin, Twitter, Mail, Phone, MapPin } from 'lucide-react';
+import { Brain, Wand2, Edit, History, Lightbulb, Users, CheckCircle, Linkedin, Twitter, Mail, Phone, MapPin, SquarePen, WandSparkles, CircleCheckBig } from 'lucide-react';
 import Image from 'next/image';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { AnimatedBackground } from '@/components/animated-background';
@@ -17,13 +17,13 @@ export default function HomePage() {
       hint: "ai technology"
     },
     {
-      icon: <Wand2 className="h-10 w-10 text-accent mb-3" />,
+      icon: <WandSparkles className="h-10 w-10 text-accent mb-3" />,
       title: "Smart Color Palettes",
       description: "Receive AI-generated color palette suggestions that harmonize with your room's existing elements.",
       hint: "color palette"
     },
     {
-      icon: <Edit className="h-10 w-10 text-accent mb-3" />,
+      icon: <SquarePen className="h-10 w-10 text-accent mb-3" />, // Changed Edit to SquarePen
       title: "Virtual Wall Repaint",
       description: "Visualize new paint colors directly on your room's photo with our AI-powered repaint feature.",
       hint: "virtual interior"
@@ -47,9 +47,9 @@ export default function HomePage() {
 
   const teamMembers = [
     {
-      name: "Alex Mint",
-      role: "Founder & CEO",
-      bio: "Passionate about blending AI with creative design to build intuitive tools.",
+      name: "Avik Samanta",
+      role: "Visionary Lead",
+      bio: "Driving the fusion of AI and design to empower creative expression.",
       image: "https://placehold.co/300x300.png",
       hint: "person portrait",
       socials: {
@@ -58,20 +58,9 @@ export default function HomePage() {
       },
     },
     {
-      name: "Jamie Fire",
-      role: "Lead Developer",
-      bio: "Expert in full-stack development and bringing complex AI visions to life.",
-      image: "https://placehold.co/300x300.png",
-      hint: "person portrait",
-      socials: {
-        linkedin: "#",
-        twitter: "#",
-      },
-    },
-    {
-      name: "Casey Design",
-      role: "Head of UX/UI",
-      bio: "Dedicated to crafting user-centric experiences that are both beautiful and functional.",
+      name: "Anusha Gupta",
+      role: "Tech Architect",
+      bio: "Engineering innovative solutions that bring sophisticated AI tools to your fingertips.",
       image: "https://placehold.co/300x300.png",
       hint: "person portrait",
       socials: {
@@ -132,7 +121,7 @@ export default function HomePage() {
                 <p className="text-muted-foreground">Designed with you in mind, La Interior offers an intuitive experience for seamless project creation.</p>
               </div>
               <div className="space-y-2">
-                <CheckCircle className="h-8 w-8 text-primary mb-2" />
+                <CircleCheckBig className="h-8 w-8 text-primary mb-2" /> 
                 <h3 className="text-xl font-semibold">Visualize with Confidence</h3>
                 <p className="text-muted-foreground">See your ideas come to life with our virtual repaint feature, ensuring you love the result.</p>
               </div>
@@ -193,7 +182,7 @@ export default function HomePage() {
         <section className="py-16 px-4 sm:px-8 z-10 relative">
           <div className="container mx-auto">
             <h2 className="text-3xl font-bold text-center mb-12 text-primary">Meet the MintFire Team</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
               {teamMembers.map((member, index) => (
                 <Card key={index} className="text-center hover:shadow-xl transition-shadow duration-300 bg-card/80 backdrop-blur-sm">
                   <CardHeader>
@@ -272,5 +261,3 @@ export default function HomePage() {
     </>
   );
 }
-
-    

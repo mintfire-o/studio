@@ -1,20 +1,30 @@
+
 'use client';
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Palette, Home, Image as ImageIcon, History, LogOut, Menu, Settings, Bot } from 'lucide-react';
+import { Palette, Home, Image as ImageIcon, History, LogOut, Menu, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { useAuth } from '@/hooks/use-auth';
 import { cn } from '@/lib/utils';
 import React from 'react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: Home },
   { href: '/dashboard/new-project', label: 'New Project', icon: ImageIcon },
   { href: '/dashboard/history', label: 'History', icon: History },
-  // { href: '/dashboard/ai-tools', label: 'AI Tools', icon: Bot }, // Could be added later
+  { href: '/dashboard/profile', label: 'Profile', icon: Settings },
 ];
 
 export default function DashboardLayout({
@@ -40,34 +50,22 @@ export default function DashboardLayout({
     return null; 
   }
   
-  const NavContent = () => (
-    <>
-      <nav className="flex-grow space-y-2 px-2 py-4">
-        {navItems.map((item) => (
-          <Button
-            key={item.href}
-            asChild
-            variant={pathname === item.href ? 'secondary' : 'ghost'}
-            className="w-full justify-start text-base"
-            onClick={() => setIsSheetOpen(false)}
-          >
-            <Link href={item.href}>
-              <item.icon className="mr-3 h-5 w-5" />
-              {item.label}
-            </Link>
-          </Button>
-        ))}
-      </nav>
-      {/* Sign Out button is now in the header for desktop, kept here for mobile sheet consistency if needed or can be removed */}
-      <div className="mt-auto p-4 space-y-2 border-t border-border md:hidden"> 
-        <Button variant="ghost" onClick={logout} className="w-full justify-start text-base text-destructive hover:text-destructive hover:bg-destructive/10">
-          <LogOut className="mr-3 h-5 w-5" />
-          Sign Out
-        </Button>
-      </div>
-    </>
+  const NavLinks = () => (
+    navItems.map((item) => (
+      <Button
+        key={item.href}
+        asChild
+        variant={pathname === item.href ? 'secondary' : 'ghost'}
+        className="w-full justify-start text-base"
+        onClick={() => setIsSheetOpen(false)} // Close sheet on mobile nav click
+      >
+        <Link href={item.href}>
+          <item.icon className="mr-3 h-5 w-5" />
+          {item.label}
+        </Link>
+      </Button>
+    ))
   );
-
 
   return (
     <div className="min-h-screen w-full flex flex-col bg-secondary/50 dark:bg-card/20">
@@ -87,7 +85,15 @@ export default function DashboardLayout({
                   <span>La Interior</span>
                 </Link>
               </div>
-              <NavContent />
+              <nav className="flex-grow space-y-2 px-2 py-4">
+                <NavLinks />
+              </nav>
+              <div className="mt-auto p-4 space-y-2 border-t border-border"> 
+                <Button variant="ghost" onClick={() => { logout(); setIsSheetOpen(false);}} className="w-full justify-start text-base text-destructive hover:text-destructive hover:bg-destructive/10">
+                  <LogOut className="mr-3 h-5 w-5" />
+                  Sign Out
+                </Button>
+              </div>
             </SheetContent>
           </Sheet>
            <Link href="/dashboard" className="hidden md:flex items-center gap-2 font-semibold text-lg">
@@ -95,37 +101,51 @@ export default function DashboardLayout({
              <span>La Interior</span>
            </Link>
         </div>
-        <div className="flex items-center gap-2 sm:gap-4">
-          <span className="text-sm text-muted-foreground hidden sm:inline">
-            Welcome, {user?.username}
-          </span>
+        <div className="flex items-center gap-3 sm:gap-4">
           <ThemeToggle />
-          <Button variant="ghost" onClick={logout} size="icon" className="hidden md:inline-flex text-muted-foreground hover:text-destructive hover:bg-destructive/10">
-            <LogOut className="h-5 w-5" />
-            <span className="sr-only">Sign Out</span>
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="relative h-10 w-10 rounded-full p-0">
+                <Avatar className="h-9 w-9">
+                  {/* Add AvatarImage if you have user profile images */}
+                  {/* <AvatarImage src={user?.profileImageUrl} alt={user?.username} /> */}
+                  <AvatarFallback>{user?.username?.charAt(0).toUpperCase() || 'U'}</AvatarFallback>
+                </Avatar>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56" align="end" forceMount>
+              <DropdownMenuLabel className="font-normal">
+                <div className="flex flex-col space-y-1">
+                  <p className="text-sm font-medium leading-none">{user?.fullName || user?.username}</p>
+                  {user?.email && (
+                    <p className="text-xs leading-none text-muted-foreground">
+                      {user.email}
+                    </p>
+                  )}
+                </div>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem asChild>
+                <Link href="/dashboard/profile">
+                  <Settings className="mr-2 h-4 w-4" />
+                  <span>Profile</span>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={logout} className="text-destructive focus:text-destructive focus:bg-destructive/10">
+                <LogOut className="mr-2 h-4 w-4" />
+                <span>Sign Out</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </header>
       
       <div className="flex flex-1 md:grid md:grid-cols-[260px_1fr]">
         <aside className="hidden md:flex h-full max-h-screen flex-col border-r bg-background shadow-inner">
-           {/* NavContent for desktop sidebar still includes navigation, but sign out is primarily in header */}
            <nav className="flex-grow space-y-2 px-2 py-4">
-            {navItems.map((item) => (
-              <Button
-                key={item.href}
-                asChild
-                variant={pathname === item.href ? 'secondary' : 'ghost'}
-                className="w-full justify-start text-base"
-              >
-                <Link href={item.href}>
-                  <item.icon className="mr-3 h-5 w-5" />
-                  {item.label}
-                </Link>
-              </Button>
-            ))}
+            <NavLinks />
           </nav>
-          {/* Optional: could add user profile/settings link here if needed */}
         </aside>
         <main className="flex-1 p-4 sm:p-6 lg:p-8 bg-background md:bg-secondary/30 dark:md:bg-muted/10 overflow-y-auto">
           {children}

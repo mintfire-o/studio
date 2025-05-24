@@ -7,17 +7,18 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import type { FormData } from '@/types'; // Using FormData for structure, though not sending all fields
+import type { FormData } from '@/types'; 
 import { Palette, KeyRound, Fingerprint, Loader2, UserPlus, LogIn } from 'lucide-react';
 import Link from 'next/link';
 import { ThemeToggle } from '@/components/theme-toggle';
+import { AnimatedBackground } from '@/components/animated-background';
 
 export default function CreateAccountPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [pin, setPin] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null); // For potential future validation errors
+  const [error, setError] = useState<string | null>(null); 
   const router = useRouter();
   const { toast } = useToast();
 
@@ -26,7 +27,6 @@ export default function CreateAccountPage() {
     setIsLoading(true);
     setError(null);
 
-    // Basic frontend validation (example)
     if (username.length < 3) {
         setError("Username must be at least 3 characters long.");
         setIsLoading(false);
@@ -43,7 +43,6 @@ export default function CreateAccountPage() {
         return;
     }
 
-    // Simulate account creation API call
     await new Promise(resolve => setTimeout(resolve, 1000));
 
     setIsLoading(false);
@@ -59,8 +58,9 @@ export default function CreateAccountPage() {
       <div className="fixed top-4 right-4 z-50">
         <ThemeToggle />
       </div>
-      <main className="flex items-center justify-center min-h-screen bg-gradient-to-br from-background to-accent/30 p-4">
-        <Card className="w-full max-w-md shadow-2xl">
+      <main className="relative flex items-center justify-center min-h-screen p-4 overflow-hidden">
+        <AnimatedBackground />
+        <Card className="w-full max-w-md shadow-2xl z-10 transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-[0_0_35px_5px_hsl(var(--primary)/0.2)]">
           <CardHeader className="text-center">
             <div className="mx-auto mb-4">
               <Palette size={48} className="text-primary" />
@@ -81,7 +81,7 @@ export default function CreateAccountPage() {
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     required
-                    className="pl-10"
+                    className="pl-10 hover:border-primary/50 focus:border-primary transition-colors duration-300"
                   />
                 </div>
               </div>
@@ -96,7 +96,7 @@ export default function CreateAccountPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    className="pl-10"
+                    className="pl-10 hover:border-primary/50 focus:border-primary transition-colors duration-300"
                   />
                 </div>
               </div>
@@ -114,12 +114,12 @@ export default function CreateAccountPage() {
                     pattern="\d{6}"
                     title="PIN must be 6 digits"
                     required
-                    className="pl-10 tracking-[0.3em]"
+                    className="pl-10 tracking-[0.3em] hover:border-primary/50 focus:border-primary transition-colors duration-300"
                   />
                 </div>
               </div>
               {error && <p className="text-sm text-destructive text-center">{error}</p>}
-              <Button type="submit" className="w-full text-lg py-3" disabled={isLoading}>
+              <Button type="submit" className="w-full text-lg py-3 transition-all duration-300 ease-in-out hover:shadow-lg transform hover:scale-[1.02]" disabled={isLoading}>
                 {isLoading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : 'Create Account'}
               </Button>
             </form>

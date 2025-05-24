@@ -11,6 +11,7 @@ import type { FormData } from '@/types';
 import { Palette, KeyRound, Fingerprint, Loader2, Home as HomeIcon, UserPlus } from 'lucide-react';
 import Link from 'next/link';
 import { ThemeToggle } from '@/components/theme-toggle';
+import { AnimatedBackground } from '@/components/animated-background';
 
 export default function LoginPage() {
   const [username, setUsername] = useState('');
@@ -31,8 +32,9 @@ export default function LoginPage() {
       <div className="fixed top-4 right-4 z-50">
         <ThemeToggle />
       </div>
-      <main className="flex items-center justify-center min-h-screen bg-gradient-to-br from-background to-accent/30 p-4">
-        <Card className="w-full max-w-md shadow-2xl">
+      <main className="relative flex items-center justify-center min-h-screen p-4 overflow-hidden">
+        <AnimatedBackground />
+        <Card className="w-full max-w-md shadow-2xl z-10 transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-[0_0_35px_5px_hsl(var(--primary)/0.2)]">
           <CardHeader className="text-center">
             <div className="mx-auto mb-4">
               <Palette size={48} className="text-primary" />
@@ -53,7 +55,7 @@ export default function LoginPage() {
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     required
-                    className="pl-10"
+                    className="pl-10 hover:border-primary/50 focus:border-primary transition-colors duration-300"
                   />
                 </div>
               </div>
@@ -68,7 +70,7 @@ export default function LoginPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    className="pl-10"
+                    className="pl-10 hover:border-primary/50 focus:border-primary transition-colors duration-300"
                   />
                 </div>
               </div>
@@ -86,15 +88,15 @@ export default function LoginPage() {
                     pattern="\d{6}"
                     title="PIN must be 6 digits"
                     required
-                    className="pl-10 tracking-[0.3em]" // For better PIN appearance
+                    className="pl-10 tracking-[0.3em] hover:border-primary/50 focus:border-primary transition-colors duration-300"
                   />
                 </div>
               </div>
               {authError && <p className="text-sm text-destructive text-center">{authError}</p>}
-              <Button type="submit" className="w-full text-lg py-3" disabled={isLoading}>
+              <Button type="submit" className="w-full text-lg py-3 transition-all duration-300 ease-in-out hover:shadow-lg transform hover:scale-[1.02]" disabled={isLoading}>
                 {isLoading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : 'Sign In'}
               </Button>
-              <Button variant="outline" className="w-full" asChild>
+              <Button variant="outline" className="w-full transition-all duration-300 ease-in-out hover:shadow-md transform hover:scale-[1.02]" asChild>
                 <Link href="/">
                   <HomeIcon className="mr-2 h-4 w-4" />
                   Back to Home

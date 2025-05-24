@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Brain, History, Lightbulb, Users, CheckCircle, Linkedin, Twitter, Mail, Phone, MapPin, SquarePen, WandSparkles, CircleCheckBig, Globe } from 'lucide-react';
+import { Brain, History, Lightbulb, Users, CheckCircle, Linkedin, Github, Mail, Phone, MapPin, SquarePen, WandSparkles, CircleCheckBig, Globe } from 'lucide-react'; // Updated Twitter to Github
 import Image from 'next/image';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { AnimatedBackground } from '@/components/animated-background';
@@ -55,7 +55,7 @@ export default function HomePage() {
       hint: "person portrait",
       socials: {
         linkedin: "https://www.linkedin.com/in/avik-samanta-05766a192/",
-        twitter: "https://x.com/isamantaavik",
+        github: "https://github.com/avksamanta", // Changed from twitter
       },
     },
     {
@@ -66,7 +66,7 @@ export default function HomePage() {
       hint: "person portrait",
       socials: {
         linkedin: "#",
-        twitter: "#",
+        github: "#", // Changed from twitter
       },
     },
   ];
@@ -246,10 +246,10 @@ export default function HomePage() {
                         </Link>
                       </Button>
                     )}
-                    {member.socials.twitter && (
+                    {member.socials.github && ( // Changed from twitter
                       <Button variant="ghost" size="icon" asChild>
-                        <Link href={member.socials.twitter} target="_blank" rel="noopener noreferrer">
-                          <Twitter className="h-5 w-5 text-primary hover:text-primary/80" />
+                        <Link href={member.socials.github} target="_blank" rel="noopener noreferrer">
+                          <Github className="h-5 w-5 text-primary hover:text-primary/80" />
                         </Link>
                       </Button>
                     )}

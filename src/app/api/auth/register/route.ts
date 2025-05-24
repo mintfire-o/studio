@@ -2,7 +2,7 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import bcrypt from 'bcryptjs';
 import type { MockStoredUser, User } from '@/types';
-import { mockUserDatabase } from '@/lib/mock-db'; // Use shared mock DB
+import { readUsersFromFile, writeUsersToFile } from '@/lib/mock-db';
 
 export async function POST(request: NextRequest) {
   try {
@@ -21,13 +21,12 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ message: 'Please enter a valid @gmail.com email address.' }, { status: 400 });
     }
 
-
     const usernameLower = username.toLowerCase();
     const emailLower = email.toLowerCase();
 
-    // --- Mock In-Memory Store Logic ---
-    // In a real app, query your PostgreSQL database here.
-    const existingUser = mockUserDatabase.find(
+    let users = readUsersFromFile();
+
+    const existingUser = users.find(
       (user) => user.username === usernameLower || (user.email && user.email.toLowerCase() === emailLower)
     );
 
@@ -39,10 +38,10 @@ export async function POST(request: NextRequest) {
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
-    const pinHash = await bcrypt.hash(pin, 10); // Also hash the PIN
+    const pinHash = await bcrypt.hash(pin, 10);
 
     const newUser: MockStoredUser = {
-      id: Date.now().toString(), // Simple ID generation for mock
+      id: Date.now().toString(), // Simple ID generation
       username: usernameLower,
       email: emailLower,
       passwordHash,
@@ -51,12 +50,9 @@ export async function POST(request: NextRequest) {
       countryCode,
       phoneNumber,
     };
-    mockUserDatabase.push(newUser);
-    // --- End Mock Logic ---
+    users.push(newUser);
+    writeUsersToFile(users);
 
-    // console.log('Mock DB after registration:', mockUserDatabase); // For debugging
-
-    // Return only non-sensitive user data
     const userToReturn: User = {
         id: newUser.id,
         username: newUser.username,

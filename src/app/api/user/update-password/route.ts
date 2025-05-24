@@ -1,10 +1,10 @@
 // src/app/api/user/update-password/route.ts
 import { NextResponse, type NextRequest } from 'next/server';
 import bcrypt from 'bcryptjs';
-import { mockUserDatabase } from '@/lib/mock-db'; // Use shared mock DB
+import { readUsersFromFile, writeUsersToFile } from '@/lib/mock-db';
 
 export async function POST(request: NextRequest) {
-  const username = request.headers.get('X-Mock-Username'); // Mock auth
+  const username = request.headers.get('X-Mock-Username');
   if (!username) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
   }
@@ -19,14 +19,13 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ message: 'New password must be at least 6 characters long' }, { status: 400 });
     }
 
-
-    // --- Mock In-Memory Store Logic ---
-    const userIndex = mockUserDatabase.findIndex(u => u.username === username.toLowerCase());
+    let users = readUsersFromFile();
+    const userIndex = users.findIndex(u => u.username === username.toLowerCase());
     if (userIndex === -1) {
       return NextResponse.json({ message: 'User not found' }, { status: 404 });
     }
 
-    const userInDb = mockUserDatabase[userIndex];
+    const userInDb = users[userIndex];
 
     if (!userInDb.passwordHash) {
         return NextResponse.json({ message: 'User record incomplete, cannot verify password.' }, { status: 500 });
@@ -38,10 +37,8 @@ export async function POST(request: NextRequest) {
     }
 
     const newPasswordHash = await bcrypt.hash(newPassword, 10);
-    mockUserDatabase[userIndex] = { ...userInDb, passwordHash: newPasswordHash };
-    // --- End Mock Logic ---
-
-    // console.log('Password updated for:', username); // For debugging
+    users[userIndex] = { ...userInDb, passwordHash: newPasswordHash };
+    writeUsersToFile(users);
 
     return NextResponse.json({ message: 'Password updated successfully' });
   } catch (error) {

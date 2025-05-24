@@ -2,7 +2,7 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import bcrypt from 'bcryptjs';
 import type { User } from '@/types';
-import { mockUserDatabase } from '@/lib/mock-db'; // Use shared mock DB
+import { readUsersFromFile } from '@/lib/mock-db';
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,10 +13,8 @@ export async function POST(request: NextRequest) {
     }
 
     const usernameLower = username.toLowerCase();
-
-    // --- Mock In-Memory Store Logic ---
-    // In a real app, query your PostgreSQL database here.
-    const userInDb = mockUserDatabase.find((user) => user.username === usernameLower);
+    const users = readUsersFromFile();
+    const userInDb = users.find((user) => user.username === usernameLower);
 
     if (!userInDb || !userInDb.passwordHash || !userInDb.pinHash) {
       return NextResponse.json({ message: 'Invalid credentials or user not found' }, { status: 401 });
@@ -28,11 +26,7 @@ export async function POST(request: NextRequest) {
     if (!isPasswordValid || !isPinValid) {
       return NextResponse.json({ message: 'Invalid credentials' }, { status: 401 });
     }
-    // --- End Mock Logic ---
 
-    // console.log('User logged in:', userInDb.username); // For debugging
-
-    // Return only non-sensitive user data
     const userToReturn: User = {
         id: userInDb.id,
         username: userInDb.username,
@@ -40,8 +34,6 @@ export async function POST(request: NextRequest) {
         fullName: userInDb.fullName,
     };
 
-    // In a real app, you'd typically generate and return a session token (e.g., JWT) here.
-    // The client would store this token and send it in headers for authenticated requests.
     return NextResponse.json({ user: userToReturn, message: 'Login successful!' });
   } catch (error) {
     console.error('Login API error:', error);

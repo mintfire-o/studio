@@ -136,7 +136,7 @@ export default function NewProjectPage() {
         setIsEditing(true);
         setProjectName(projectToEdit.name);
         setRoomPhoto({ name: 'Uploaded room image', dataUrl: projectToEdit.originalPhotoDataUri });
-        setUserSelectedColors(projectToEdit.selectedColors);
+        setUserSelectedColors(Array.from(new Set(projectToEdit.selectedColors))); // De-duplicate
         
         if (projectToEdit.aiSuggestedPalette) setAiSuggestedPalette(projectToEdit.aiSuggestedPalette);
         if (projectToEdit.sheenSuggestion) setAiSheen(projectToEdit.sheenSuggestion);
@@ -264,7 +264,7 @@ export default function NewProjectPage() {
       roomPhotoUrl: aiRepaintedImage.suggestion || roomPhoto.dataUrl, 
       originalPhotoDataUri: roomPhoto.dataUrl,
       aiRepaintedPhotoDataUri: (aiRepaintedImage.suggestion && aiRepaintedImage.suggestion !== roomPhoto.dataUrl) ? aiRepaintedImage.suggestion : null,
-      selectedColors: userSelectedColors,
+      selectedColors: Array.from(new Set(userSelectedColors)), // Ensure uniqueness on save
       aiSuggestedPalette: aiSuggestedPalette.suggestion.length > 0 ? aiSuggestedPalette : null,
       sheenSuggestion: aiSheen.suggestion ? aiSheen : null,
       complementaryColorsSuggestion: aiComplementary.suggestion.length > 0 ? aiComplementary : null,
@@ -368,7 +368,7 @@ export default function NewProjectPage() {
                   <div className="mt-2 flex flex-wrap gap-2">
                     {aiDetectedWallColors.suggestion.map((color, idx) => (
                       <ColorSwatch 
-                        key={idx} 
+                        key={`${color.hex}-${idx}`} 
                         color={color.hex} 
                         label={color.name} 
                         onClick={() => handleColorSelection(color.hex)}
@@ -413,8 +413,8 @@ export default function NewProjectPage() {
                       <div>
                         <h4 className="text-sm font-medium mb-2 text-muted-foreground">Your Added Colors:</h4>
                         <div className="flex flex-wrap gap-2">
-                          {userSelectedColors.map(color => (
-                            <div key={color} className="relative group">
+                          {userSelectedColors.map((color, index) => (
+                            <div key={`${color}-${index}`} className="relative group">
                               <ColorSwatch color={color} isSelected={color === activeColorForWall} onClick={() => handleColorSelection(color)} showCopyButton/>
                               <Button variant="destructive" size="icon" className="absolute -top-2 -right-2 h-5 w-5 p-0 opacity-0 group-hover:opacity-100 transition-opacity rounded-full" onClick={(e) => { e.stopPropagation(); handleRemoveSelectedColor(color);}}>
                                 <XCircle className="h-4 w-4"/>
@@ -479,3 +479,5 @@ export default function NewProjectPage() {
   );
 }
 
+
+    

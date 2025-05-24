@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -309,11 +310,17 @@ export default function NewProjectPage() {
         <Card>
             <CardHeader>
                 <CardTitle className="text-xl">Project Preview</CardTitle>
-                <CardDescription>This is a conceptual preview. Actual color replacement on image is an advanced feature.</CardDescription>
+                <CardDescription>This is a conceptual preview. Actual color replacement on image is an advanced feature. The active color tint helps visualize.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-                <div className="aspect-video relative w-full max-w-xl mx-auto rounded-lg overflow-hidden border shadow-lg">
+                <div className="aspect-video relative w-full max-w-xl mx-auto rounded-lg overflow-hidden border shadow-lg bg-muted/20">
                     <NextImage src={roomPhoto.dataUrl} alt={projectName || "Room Preview"} layout="fill" objectFit="contain" />
+                    {activeColorForAiTools && (
+                        <div
+                            style={{ backgroundColor: activeColorForAiTools }}
+                            className="absolute inset-0 mix-blend-color pointer-events-none"
+                        />
+                    )}
                 </div>
                 {(selectedColors.length > 0 || (aiPalette.suggestion && aiPalette.suggestion.length > 0)) && (
                     <div>
@@ -323,6 +330,11 @@ export default function NewProjectPage() {
                         )}
                         {aiPalette.suggestion && aiPalette.suggestion.length > 0 && !selectedColors.some(c => aiPalette.suggestion!.includes(c)) && (
                             <ColorPaletteDisplay colors={aiPalette.suggestion} title="AI Suggested Palette:" />
+                        )}
+                         {activeColorForAiTools && (
+                            <p className="text-sm mt-2">
+                                Preview tinted with: <ColorSwatch color={activeColorForAiTools} size="sm" className="inline-block align-middle" /> <span style={{color: activeColorForAiTools, fontWeight: 'bold'}}>{activeColorForAiTools}</span>
+                            </p>
                         )}
                     </div>
                 )}
@@ -342,18 +354,3 @@ export default function NewProjectPage() {
     </div>
   );
 }
-
-// Helper component to display loading/error for AI suggestions - not used currently, integrated into main component
-// const AISuggestionDisplay = <T,>({ suggestion, renderSuggestion, title }: { suggestion: AISuggestion<T>, renderSuggestion: (data: T) => ReactNode, title: string }) => {
-//   if (suggestion.isLoading) return <div className="flex items-center"><Loader2 className="mr-2 h-4 w-4 animate-spin" />Loading {title}...</div>;
-//   if (suggestion.error) return <p className="text-sm text-destructive">Error loading {title}: {suggestion.error}</p>;
-//   if (!suggestion.suggestion || (Array.isArray(suggestion.suggestion) && suggestion.suggestion.length === 0)) return null;
-
-//   return (
-//     <div>
-//       <h4 className="text-sm font-medium text-muted-foreground">{title}:</h4>
-//       {renderSuggestion(suggestion.suggestion)}
-//       {suggestion.reasoning && <p className="text-xs text-muted-foreground mt-1">{suggestion.reasoning}</p>}
-//     </div>
-//   );
-// };

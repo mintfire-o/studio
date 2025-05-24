@@ -6,7 +6,7 @@ export interface User {
   email?: string;
 }
 
-// For storing in our mock in-memory "database" (mock-db.ts)
+// For storing in our mock "database" (mock-db.ts)
 export interface MockStoredUser {
   id: string;
   username: string;
@@ -41,6 +41,14 @@ export interface AIWallColorSuggestion extends AISuggestion<DetectedWallColor[]>
   // suggestion will be an array of DetectedWallColor
 }
 
+export interface QuestionnaireAnswers {
+  favoriteColor: string;
+  mood: string;
+  ageRange: string;
+  theme: string;
+  roomType: string;
+  lightingPreference: string;
+}
 
 export interface Project {
   id: string;
@@ -49,10 +57,11 @@ export interface Project {
   originalPhotoDataUri: string;
   aiRepaintedPhotoDataUri?: string | null;
   selectedColors: string[];
-  aiSuggestedPalette: AISuggestion<string[]> | null;
+  aiSuggestedPalette: AISuggestion<string[]> | null; // Can be used for image-based or preference-based
   sheenSuggestion: AISuggestion<string> | null;
   complementaryColorsSuggestion: AISuggestion<string[]> | null;
   aiDetectedWallColors?: AIWallColorSuggestion | null;
+  questionnaireAnswers?: QuestionnaireAnswers | null; // Store answers
   createdAt: string;
 }
 
@@ -65,3 +74,4 @@ export interface FormData {
   password?: string;
   pin?: string;
 }
+

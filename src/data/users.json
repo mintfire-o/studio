@@ -1,1 +1,12 @@
-[]
+[
+  {
+    "id": "1748105124866",
+    "username": "@test",
+    "email": "joker@gmail.com",
+    "passwordHash": "$2a$10$XpZM3SwNTdVApbrFG9A9COI1sJO0zvYDtRLcCnk7UpkiBbfxu8A.O",
+    "pinHash": "$2a$10$1X8McBXRi.GBaGchA6/HV.ThID12XyqbPuvSsfHaWLats2k5cJbLW",
+    "fullName": "Test",
+    "countryCode": "+91",
+    "phoneNumber": "9999999999"
+  }
+]

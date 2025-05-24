@@ -2,11 +2,12 @@
 'use client';
 
 import type { User, FormData } from '@/types';
-import { mockLogin } from '@/lib/mock-auth';
 import { useRouter, usePathname } from 'next/navigation';
 import React, { createContext, useState, useEffect, type ReactNode } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import StylusTextAnimation from '@/components/stylus-text-animation'; // Import the animation
+import StylusTextAnimation from '@/components/stylus-text-animation'; 
+import { NextResponse, type NextRequest } from 'next/server';
+
 
 export interface AuthContextType {
   user: User | null;
@@ -20,14 +21,13 @@ export const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true); // Start with loading true to check session
+  const [isLoading, setIsLoading] = useState(true); 
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const pathname = usePathname();
   const { toast } = useToast();
 
   useEffect(() => {
-    // Check for persisted session (e.g., from localStorage)
     const storedUser = localStorage.getItem('laInteriorUser');
     if (storedUser) {
       try {
@@ -52,17 +52,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(true);
     setError(null);
     try {
-      const loggedInUser = await mockLogin(credentials);
-      if (loggedInUser) {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(credentials),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        const loggedInUser = data.user as User;
         setUser(loggedInUser);
-        localStorage.setItem('laInteriorUser', JSON.stringify(loggedInUser));
+        localStorage.setItem('laInteriorUser', JSON.stringify(loggedInUser)); // Store user session
         toast({ title: 'Login Successful', description: `Welcome back, ${loggedInUser.username}!` });
         router.push('/dashboard');
       } else {
-        setError('Invalid username, password, or PIN.');
-        toast({ title: 'Login Failed', description: 'Invalid credentials. Please try again.', variant: 'destructive' });
+        setError(data.message || 'Invalid username, password, or PIN.');
+        toast({ title: 'Login Failed', description: data.message || 'Invalid credentials. Please try again.', variant: 'destructive' });
       }
     } catch (e) {
+      console.error("Login API call error:", e);
       setError('An unexpected error occurred during login.');
       toast({ title: 'Login Error', description: 'An unexpected error occurred.', variant: 'destructive' });
     } finally {
@@ -71,15 +80,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const logout = () => {
+    setIsLoading(true); // Show loader during logout process
     setUser(null);
     localStorage.removeItem('laInteriorUser');
     toast({ title: 'Logged Out', description: 'You have been successfully logged out.' });
-    router.push('/login');
+    // Simulate a slight delay for the loader to be visible if needed
+    setTimeout(() => {
+        router.push('/login');
+        setIsLoading(false);
+    }, 300); 
   };
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-background">
+      <div className="fixed inset-0 z-[70] flex flex-col items-center justify-center bg-background">
         <StylusTextAnimation />
       </div>
     );

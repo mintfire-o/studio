@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Leaf, Home, Image as ImageIcon, History, LogOut, Menu, Settings, User } from 'lucide-react'; // Changed Palette to Leaf
+import { Leaf, Home, Image as ImageIcon, History, LogOut, Menu, Settings, User } from 'lucide-react'; 
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { ThemeToggle } from '@/components/theme-toggle';
@@ -18,6 +18,8 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import StylusTextAnimation from '@/components/stylus-text-animation'; 
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+
 
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: Home },
@@ -38,13 +40,14 @@ export default function DashboardLayout({
 
   if (authLoading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-background">
+      <div className="fixed inset-0 z-[70] flex flex-col items-center justify-center bg-background">
         <StylusTextAnimation />
       </div>
     );
   }
 
   if (!user) {
+    // AuthProvider will redirect, this is an additional safeguard or for when authLoading is false but user is still null.
     return null; 
   }
   
@@ -79,7 +82,7 @@ export default function DashboardLayout({
             <SheetContent side="left" className="flex flex-col p-0 w-72">
               <div className="flex h-16 items-center border-b px-4">
                 <Link href="/dashboard" className="flex items-center gap-2 font-semibold text-lg" onClick={() => setIsSheetOpen(false)}>
-                  <Leaf className="h-7 w-7 text-primary" /> {/* Changed Palette to Leaf */}
+                  <Leaf className="h-7 w-7 text-primary" /> 
                   <span>La Interior</span>
                 </Link>
               </div>
@@ -95,7 +98,7 @@ export default function DashboardLayout({
             </SheetContent>
           </Sheet>
            <Link href="/dashboard" className="hidden md:flex items-center gap-2 font-semibold text-lg">
-             <Leaf className="h-7 w-7 text-primary" /> {/* Changed Palette to Leaf */}
+             <Leaf className="h-7 w-7 text-primary" /> 
              <span>La Interior</span>
            </Link>
         </div>

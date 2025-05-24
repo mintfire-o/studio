@@ -9,7 +9,9 @@ import Image from 'next/image';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { AnimatedBackground } from '@/components/animated-background';
 import StylusTextAnimation from '@/components/stylus-text-animation';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { generateInspirationImage, type GenerateInspirationImageOutput } from '@/ai/flows/generate-inspiration-image-flow';
+import { Loader2 } from 'lucide-react';
 
 const features = [
   {
@@ -38,7 +40,14 @@ const features = [
   }
 ];
 
-const staticHomeGalleryImages = [
+interface StaticGalleryImage {
+  id: string;
+  src: string;
+  alt: string;
+  hint: string;
+}
+
+const initialStaticHomeGalleryImages: StaticGalleryImage[] = [
   { id: 'home-living-room', src: "https://placehold.co/600x400.png", alt: "Luxurious Modern Living Room", hint: "living room modern" },
   { id: 'home-bedroom', src: "https://placehold.co/600x400.png", alt: "Serene Minimalist Bedroom", hint: "bedroom minimalist" },
   { id: 'home-kitchen', src: "https://placehold.co/600x400.png", alt: "Rustic Farmhouse Kitchen", hint: "kitchen farmhouse" },
@@ -47,16 +56,17 @@ const staticHomeGalleryImages = [
   { id: 'home-patio', src: "https://placehold.co/600x400.png", alt: "Cozy Outdoor Patio", hint: "patio outdoor" },
 ];
 
+
 const teamMembers = [
   {
     name: "Avik Samanta",
     role: "Founder\n\nCybersecurity Engineer | Blockchain Specialist | Bug Bounty Hunter",
     bio: "Skilled in vulnerability research, ethical hacking, and securing digital infrastructures. Passionate about advancing blockchain security, identifying threats, and building innovative security solutions.",
     image: "https://placehold.co/300x300.png",
-    hint: "person portrait",
+    hint: "man illustration", // Updated hint
     socials: {
-      linkedin: "https://www.linkedin.com/in/avik-samanta-root/",
       github: "https://github.com/avik-root", 
+      linkedin: "https://www.linkedin.com/in/avik-samanta-root/",
     },
   },
   {
@@ -66,8 +76,8 @@ const teamMembers = [
     image: "https://placehold.co/300x300.png",
     hint: "person portrait",
     socials: {
-      linkedin: "https://www.linkedin.com/in/anusha-gupta-ofc/", 
       github: "https://github.com/anushagupta11", 
+      linkedin: "https://www.linkedin.com/in/anusha-gupta-ofc/", 
     },
   },
 ];
@@ -109,6 +119,8 @@ const contactInfo = [
 
 
 export default function HomePage() {
+  const [galleryImages, setGalleryImages] = useState<StaticGalleryImage[]>(initialStaticHomeGalleryImages);
+
   return (
     <>
       <div className="fixed top-4 right-4 z-50">
@@ -192,7 +204,7 @@ export default function HomePage() {
           <div className="container mx-auto">
             <h2 className="text-3xl font-bold text-center mb-12 text-primary">Inspiration Gallery</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {staticHomeGalleryImages.map((img) => (
+                {galleryImages.map((img) => (
                     <div key={img.id} className="rounded-lg overflow-hidden shadow-lg aspect-video relative group border-2 border-primary/30 hover:border-primary transition-all duration-300 bg-muted/50">
                         <Image 
                             src={img.src} 
@@ -291,3 +303,4 @@ export default function HomePage() {
     </>
   );
 }
+

@@ -66,7 +66,7 @@ const teamMembers = [
     image: "https://placehold.co/300x300.png",
     hint: "person portrait",
     socials: {
-      linkedin: "#", 
+      linkedin: "#", // Add Anusha's LinkedIn URL here
       github: "#", 
     },
   },
@@ -95,7 +95,7 @@ const contactInfo = [
     icon: <Phone className="h-12 w-12 text-primary mb-4" />,
     title: "Call Us",
     details: (
-      <a href="tel:+916200000000" className="hover:text-primary transition-colors"> {/* Updated Phone */}
+      <a href="tel:+916200000000" className="hover:text-primary transition-colors">
         +91 62XXX XXX20
       </a>
     ),
@@ -291,3 +291,4 @@ export default function HomePage() {
     </>
   );
 }
+

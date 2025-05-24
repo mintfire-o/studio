@@ -135,7 +135,7 @@ export default function CreateAccountPage() {
       </div>
       <main className="relative flex items-center justify-center min-h-screen p-4 overflow-hidden">
         <AnimatedBackground />
-        <Card className="w-full max-w-md shadow-2xl z-10 transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-[0_0_35px_5px_hsl(var(--primary)/0.2)] bg-card/80 backdrop-blur-sm dark:bg-card/70">
+        <Card className="w-full max-w-md shadow-2xl z-10 transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-[0_0_35px_5px_hsl(var(--primary)/0.2)] bg-card/50 backdrop-blur-sm dark:bg-card/40">
           <CardHeader className="text-center">
             <div className="mx-auto mb-4">
               <Palette size={48} className="text-primary" />
@@ -282,5 +282,3 @@ export default function CreateAccountPage() {
     </>
   );
 }
-
-    

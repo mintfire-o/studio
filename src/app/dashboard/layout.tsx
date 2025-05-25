@@ -3,9 +3,10 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Leaf, Home, Image as ImageIcon, History, LogOut, Menu, Settings, User } from 'lucide-react'; 
+import { Image as ImageIcon, History, LogOut, Menu, Settings, User } from 'lucide-react'; 
+import ContinuousLineHouseIcon from '@/components/continuous-line-house-icon'; // Changed import
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { useAuth } from '@/hooks/use-auth';
 import React from 'react';
@@ -18,11 +19,11 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import StylusTextAnimation from '@/components/stylus-text-animation'; 
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { AnimatedBackground } from '@/components/animated-background';
 
 
 const navItems = [
-  { href: '/dashboard', label: 'Dashboard', icon: Home },
+  { href: '/dashboard', label: 'Dashboard', icon: ContinuousLineHouseIcon }, // Changed icon
   { href: '/dashboard/new-project', label: 'New Project', icon: ImageIcon },
   { href: '/dashboard/history', label: 'History', icon: History },
   { href: '/dashboard/profile', label: 'Profile', icon: Settings },
@@ -61,7 +62,7 @@ export default function DashboardLayout({
         onClick={() => setIsSheetOpen(false)} 
       >
         <Link href={item.href}>
-          <item.icon className="mr-3 h-5 w-5" />
+          <item.icon className={`mr-3 h-5 w-5 ${pathname === item.href ? 'text-secondary-foreground' : 'text-primary'}`} /> {/* Adjusted icon color for active state */}
           {item.label}
         </Link>
       </Button>
@@ -69,8 +70,9 @@ export default function DashboardLayout({
   );
 
   return (
-    <div className="min-h-screen w-full flex flex-col bg-secondary/50 dark:bg-card/20">
-      <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background px-4 sm:px-6 shadow-sm">
+    <div className="min-h-screen w-full flex flex-col relative">
+      <AnimatedBackground />
+      <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background/80 backdrop-blur-md px-4 sm:px-6 shadow-sm">
         <div className="flex items-center gap-2">
           <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
             <SheetTrigger asChild>
@@ -79,13 +81,15 @@ export default function DashboardLayout({
                 <span className="sr-only">Toggle navigation menu</span>
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="flex flex-col p-0 w-72">
-              <div className="flex h-16 items-center border-b px-4">
-                <Link href="/dashboard" className="flex items-center gap-2 font-semibold text-lg" onClick={() => setIsSheetOpen(false)}>
-                  <Leaf className="h-7 w-7 text-primary" /> 
-                  <span>La Interior</span>
-                </Link>
-              </div>
+            <SheetContent side="left" className="flex flex-col p-0 w-72 bg-background/90 backdrop-blur-md">
+              <SheetHeader className="border-b p-4"> {/* Added p-4 for padding consistency */}
+                <SheetTitle>
+                  <Link href="/dashboard" className="flex items-center gap-2 font-semibold text-lg" onClick={() => setIsSheetOpen(false)}>
+                    <ContinuousLineHouseIcon className="text-primary h-7 w-7" /> {/* Changed icon */}
+                    <span>La Interior</span>
+                  </Link>
+                </SheetTitle>
+              </SheetHeader>
               <nav className="flex-grow space-y-2 px-2 py-4">
                 <NavLinks />
               </nav>
@@ -98,7 +102,7 @@ export default function DashboardLayout({
             </SheetContent>
           </Sheet>
            <Link href="/dashboard" className="hidden md:flex items-center gap-2 font-semibold text-lg">
-             <Leaf className="h-7 w-7 text-primary" /> 
+             <ContinuousLineHouseIcon className="text-primary h-7 w-7" /> {/* Changed icon */}
              <span>La Interior</span>
            </Link>
         </div>
@@ -111,7 +115,7 @@ export default function DashboardLayout({
                 <span className="sr-only">Open user menu</span>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56" align="end" forceMount>
+            <DropdownMenuContent className="w-56 bg-background/90 backdrop-blur-md" align="end" forceMount>
               <DropdownMenuLabel className="font-normal">
                 <div className="flex flex-col space-y-1">
                   <p className="text-sm font-medium leading-none">{user?.fullName || user?.username}</p>
@@ -140,12 +144,12 @@ export default function DashboardLayout({
       </header>
       
       <div className="flex flex-1 md:grid md:grid-cols-[260px_1fr]">
-        <aside className="hidden md:flex h-full max-h-screen flex-col border-r bg-background shadow-inner">
+        <aside className="hidden md:flex h-full max-h-screen flex-col border-r bg-background/80 backdrop-blur-md shadow-inner">
            <nav className="flex-grow space-y-2 px-2 py-4">
             <NavLinks />
           </nav>
         </aside>
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 bg-background md:bg-secondary/30 dark:md:bg-muted/10 overflow-y-auto">
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 bg-background/70 backdrop-blur-md md:bg-secondary/30 dark:md:bg-muted/10 overflow-y-auto">
           {children}
         </main>
       </div>

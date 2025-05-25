@@ -2,7 +2,7 @@
 'use client';
 
 import React from 'react';
-import { Leaf } from 'lucide-react';
+import { Leaf } from 'lucide-react'; // Ensure Leaf is imported
 
 const StylusTextAnimation: React.FC = () => {
   return (

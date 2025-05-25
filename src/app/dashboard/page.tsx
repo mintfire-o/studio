@@ -9,9 +9,9 @@ import { ImageIcon, History, Palette, Bot } from 'lucide-react';
 import Image from 'next/image';
 
 const staticDashboardGalleryImages = [
-  { id: 'living-room', src: "https://placehold.co/600x400.png", alt: "Scandinavian Living Room", hint: "living room scandinavian" },
-  { id: 'bedroom', src: "https://placehold.co/600x400.png", alt: "Bohemian Bedroom", hint: "bedroom bohemian" },
-  { id: 'kitchen', src: "https://placehold.co/600x400.png", alt: "Modern Minimalist Kitchen", hint: "kitchen modern" }
+  { id: 'scandinavian-living-room', src: "https://drive.google.com/uc?export=view&id=1Mm9tZmk9BKn7wi9Jw2Ai_-A7q60lHUA1", alt: "Scandinavian Living Room", hint: "living room scandinavian" },
+  { id: 'bohemian-bedroom', src: "https://drive.google.com/uc?export=view&id=18iRNYBIDP26v3VV9qb3836w0M1971cpn", alt: "Bohemian Bedroom", hint: "bedroom bohemian" },
+  { id: 'modern-minimalist-kitchen', src: "https://drive.google.com/uc?export=view&id=1vmL4CuSwb6lAeYxI5vGFffmY7EcMkiza", alt: "Modern Minimalist Kitchen", hint: "kitchen modern" }
 ];
 
 

@@ -4,13 +4,12 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Brain, History, Lightbulb, Users, CheckCircle, Linkedin, Github, Mail, Phone, MapPin, SquarePen, WandSparkles, CircleCheckBig, Globe, Leaf, Loader2, Palette } from 'lucide-react';
+import { Brain, History, Lightbulb, Users, CheckCircle, Linkedin, Github, Mail, Phone, MapPin, SquarePen, WandSparkles, CircleCheckBig, Globe, Leaf, Loader2, Palette, Home } from 'lucide-react';
 import Image from 'next/image';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { AnimatedBackground } from '@/components/animated-background';
 import StylusTextAnimation from '@/components/stylus-text-animation';
 import React, { useEffect, useState } from 'react';
-import { generateInspirationImage, type GenerateInspirationImageOutput } from '@/ai/flows/generate-inspiration-image-flow';
 
 
 const features = [
@@ -48,12 +47,12 @@ interface StaticGalleryImage {
 }
 
 const initialStaticHomeGalleryImages: StaticGalleryImage[] = [
-  { id: 'home-living-room', src: "https://placehold.co/600x400.png", alt: "Luxurious Modern Living Room", hint: "living room modern" },
-  { id: 'home-bedroom', src: "https://placehold.co/600x400.png", alt: "Serene Minimalist Bedroom", hint: "bedroom minimalist" },
-  { id: 'home-kitchen', src: "https://placehold.co/600x400.png", alt: "Rustic Farmhouse Kitchen", hint: "kitchen farmhouse" },
-  { id: 'home-office', src: "https://placehold.co/600x400.png", alt: "Creative Home Office", hint: "office creative" },
-  { id: 'home-dining', src: "https://placehold.co/600x400.png", alt: "Elegant Dining Room", hint: "dining elegant" },
-  { id: 'home-patio', src: "https://placehold.co/600x400.png", alt: "Cozy Outdoor Patio", hint: "patio outdoor" },
+  { id: 'home-luxurious-living-room', src: "https://drive.google.com/uc?export=view&id=1WgXi8jrVk6C7s4tt5zZjOMZEnOVKeiXk", alt: "Luxurious Modern Living Room", hint: "living room modern" },
+  { id: 'home-serene-bedroom', src: "https://drive.google.com/uc?export=view&id=16ViciytMdEMMV41XQCjB5awx7JqWKpOB", alt: "Serene Minimalist Bedroom", hint: "bedroom minimalist" },
+  { id: 'home-rustic-kitchen', src: "https://drive.google.com/uc?export=view&id=1Lc-fDjiwhnSyAsN6Yxt4wv6ip4Ac2eoz", alt: "Rustic Farmhouse Kitchen", hint: "kitchen farmhouse" },
+  { id: 'home-creative-office', src: "https://drive.google.com/uc?export=view&id=1RESgDhmWjs7xzBzsTVrEdUP4v1ElLKBR", alt: "Creative Home Office", hint: "office creative" },
+  { id: 'home-elegant-dining', src: "https://drive.google.com/uc?export=view&id=11gLurrm-fg52BOJRc4wN6qfFdwIriIO9", alt: "Elegant Dining Room", hint: "dining elegant" },
+  { id: 'home-cozy-patio', src: "https://drive.google.com/uc?export=view&id=1ySKXYr2ZVdkCsqf85qc30jr_Ub9IIAzy", alt: "Cozy Outdoor Patio", hint: "patio outdoor" },
 ];
 
 
@@ -73,7 +72,7 @@ const teamMembers = [
     name: "Anusha Gupta",
     role: "Founder\n\nSoftware Developer | AI Web Developer | Cybersecurity Enthusiast",
     bio: "Skilled in software and web development, AI integration, Python automation, and secure application design. Focused on leveraging machine learning and vulnerability research to create innovative, secure solutions.",
-    image: "https://placehold.co/300x300.png", // Kept placeholder as no new link was provided
+    image: "https://drive.google.com/uc?export=view&id=1ZZoclZGO4N45V56OsY4cccAt9bc2n7G7", 
     hint: "person portrait",
     socials: {
       github: "https://github.com/anushagupta11", 
@@ -120,7 +119,6 @@ const contactInfo = [
 
 export default function HomePage() {
   const [galleryImages, setGalleryImages] = useState<StaticGalleryImage[]>(initialStaticHomeGalleryImages);
-  // Removed AI image generation logic as per previous request for static images
 
   return (
     <>
@@ -304,4 +302,3 @@ export default function HomePage() {
     </>
   );
 }
-

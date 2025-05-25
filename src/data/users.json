@@ -8,5 +8,15 @@
     "fullName": "Test",
     "countryCode": "+91",
     "phoneNumber": "9999999999"
+  },
+  {
+    "id": "1748154149109",
+    "username": "@lisa",
+    "email": "lisa@gmail.com",
+    "passwordHash": "$2a$10$jbCRsEEAQtZKyB7TdyHbferHAoc29Z5KvS7n7WSG9DCccIZCCtIHm",
+    "pinHash": "$2a$10$xlVOkJZn7AsqE4VDZnpsTOVQw8sUXDRTZsaHlzAayEFwsJu0xeUgK",
+    "fullName": "Lisa",
+    "countryCode": "+91",
+    "phoneNumber": "9090909009"
   }
 ]

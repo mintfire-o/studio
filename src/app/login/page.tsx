@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/hooks/use-auth';
 import type { FormData } from '@/types';
-import { Leaf, KeyRound, Fingerprint, Loader2, Home as HomeIcon, UserPlus } from 'lucide-react'; 
+import { Home, KeyRound, Fingerprint, Loader2, Home as HomeIcon, UserPlus } from 'lucide-react'; 
 import Link from 'next/link';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { AnimatedBackground } from '@/components/animated-background';
@@ -34,10 +34,10 @@ export default function LoginPage() {
       </div>
       <main className="relative flex items-center justify-center min-h-screen p-4 overflow-hidden">
         <AnimatedBackground />
-        <Card className="w-full max-w-md shadow-2xl z-10 transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-[0_0_35px_5px_hsl(var(--primary)/0.2)] bg-card/50 backdrop-blur-sm dark:bg-card/40">
+        <Card className="w-full max-w-md shadow-2xl z-10 transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-[0_0_35px_5px_hsl(var(--primary)/0.2)] bg-card/50 backdrop-blur-md dark:bg-card/40">
           <CardHeader className="text-center">
             <div className="mx-auto mb-4">
-              <Leaf size={48} className="text-primary" /> 
+              <Home size={48} className="text-primary" /> 
             </div>
             <CardTitle className="text-3xl font-bold">La Interior</CardTitle>
             <CardDescription>Sign in to unlock your creative vision.</CardDescription>

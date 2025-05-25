@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/hooks/use-auth';
 import type { FormData } from '@/types';
-import { KeyRound, Fingerprint, Loader2, UserPlus, Feather } from 'lucide-react'; 
+import { KeyRound, Fingerprint, Loader2, UserPlus, Feather, Home } from 'lucide-react';
 import Link from 'next/link';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { AnimatedBackground } from '@/components/animated-background';
@@ -24,7 +24,7 @@ export default function LoginPage() {
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     const credentials: Pick<FormData, 'username' | 'password' | 'pin'> = { username, password, pin };
-    await login(credentials as FormData); 
+    await login(credentials as FormData);
   };
 
   return (
@@ -37,7 +37,7 @@ export default function LoginPage() {
         <Card className="w-full max-w-md shadow-2xl z-10 transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-[0_0_35px_5px_hsl(var(--primary)/0.2)] bg-card/50 backdrop-blur-md dark:bg-card/40">
           <CardHeader className="text-center">
             <div className="mx-auto mb-4">
-              <Feather size={48} className="text-primary" /> 
+              <Feather size={48} className="text-primary" />
             </div>
             <CardTitle className="text-3xl font-bold">La Interior</CardTitle>
             <CardDescription>Sign in to unlock your creative vision.</CardDescription>
@@ -80,10 +80,10 @@ export default function LoginPage() {
                    <Fingerprint className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                   <Input
                     id="pin"
-                    type="password" 
+                    type="password"
                     placeholder="••••••"
                     value={pin}
-                    onChange={(e) => setPin(e.target.value.replace(/\D/g, ''))} 
+                    onChange={(e) => setPin(e.target.value.replace(/\D/g, ''))}
                     maxLength={6}
                     pattern="\d{6}"
                     title="PIN must be 6 digits"
@@ -98,15 +98,20 @@ export default function LoginPage() {
               </Button>
             </form>
           </CardContent>
-          <CardFooter className="flex flex-col items-center text-center text-xs text-muted-foreground space-y-2 pt-6">
-            <p>
+          <CardFooter className="flex flex-col items-center text-center text-muted-foreground space-y-3 pt-6">
+            <p className="text-sm">
               Don&apos;t have an account?{' '}
-              <Button variant="link" className="p-0 h-auto text-xs" asChild>
+              <Button variant="link" className="p-0 h-auto text-sm" asChild>
                   <Link href="/create-account">
                     <UserPlus className="mr-1 h-3 w-3" /> Create one
                   </Link>
               </Button>
             </p>
+            <Button variant="outline" size="sm" className="w-full" asChild>
+              <Link href="/">
+                <Home className="mr-2 h-4 w-4" /> Back to Home
+              </Link>
+            </Button>
           </CardFooter>
         </Card>
       </main>

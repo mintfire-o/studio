@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, type ChangeEvent, useRef } from 'react';
@@ -16,7 +17,7 @@ interface FileUploadProps {
 export function FileUpload({
   onFileUpload,
   acceptedFileTypes = "image/jpeg, image/png, image/webp",
-  maxFileSize = 5 * 1024 * 1024, // 5MB
+  maxFileSize = 20 * 1024 * 1024, // 20MB
 }: FileUploadProps) {
   const [preview, setPreview] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string | null>(null);

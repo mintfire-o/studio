@@ -11,11 +11,10 @@ const ContinuousLineHouseIcon = React.forwardRef<
   SVGSVGElement,
   ContinuousLineHouseIconProps
 >(({ color = 'currentColor', size = 24, strokeWidth = 2, className, ...props }, ref) => {
-  // This path attempts to draw a house with a chimney in a continuous line style
-  // M0,20 -> L4,20 (ground-left) -> L4,10 (left-wall) -> L11,4 (roof-left-slope-part1)
-  // -> L11,2 (chimney-left-up) -> L13,2 (chimney-top) -> L13,4 (chimney-right-down)
-  // -> L20,10 (roof-right-slope) -> L20,20 (right-wall) -> L24,20 (ground-right)
-  const pathData = "M0 20 L4 20 L4 10 L11 4 L11 2 L13 2 L13 4 L20 10 L20 20 L24 20";
+  // Path for the main house outline with chimney
+  const housePathData = "M2 20 L6 20 L6 10 L12 4 L12 2 L14 2 L14 4 L18 10 L18 20 L22 20";
+  // Path for the door (centered at the base)
+  const doorPathData = "M10 20 L10 15 L14 15 L14 20"; // Simple rectangle for the door
 
   return (
     <svg
@@ -32,7 +31,8 @@ const ContinuousLineHouseIcon = React.forwardRef<
       className={className}
       {...props}
     >
-      <path d={pathData} />
+      <path d={housePathData} />
+      <path d={doorPathData} />
     </svg>
   );
 });

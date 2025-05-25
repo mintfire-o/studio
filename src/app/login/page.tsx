@@ -9,8 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/hooks/use-auth';
 import type { FormData } from '@/types';
-import { KeyRound, Fingerprint, Loader2, UserPlus } from 'lucide-react'; 
-import ContinuousLineHouseIcon from '@/components/continuous-line-house-icon'; // Changed import
+import { KeyRound, Fingerprint, Loader2, UserPlus, Feather } from 'lucide-react'; 
 import Link from 'next/link';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { AnimatedBackground } from '@/components/animated-background';
@@ -38,7 +37,7 @@ export default function LoginPage() {
         <Card className="w-full max-w-md shadow-2xl z-10 transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-[0_0_35px_5px_hsl(var(--primary)/0.2)] bg-card/50 backdrop-blur-md dark:bg-card/40">
           <CardHeader className="text-center">
             <div className="mx-auto mb-4">
-              <ContinuousLineHouseIcon size={48} className="text-primary" /> 
+              <Feather size={48} className="text-primary" /> 
             </div>
             <CardTitle className="text-3xl font-bold">La Interior</CardTitle>
             <CardDescription>Sign in to unlock your creative vision.</CardDescription>
@@ -96,12 +95,6 @@ export default function LoginPage() {
               {authError && <p className="text-sm text-destructive text-center">{authError}</p>}
               <Button type="submit" className="w-full text-lg py-3 transition-all duration-300 ease-in-out hover:shadow-lg transform hover:scale-[1.02]" disabled={isLoading}>
                 {isLoading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : 'Sign In'}
-              </Button>
-              <Button variant="outline" className="w-full transition-all duration-300 ease-in-out hover:shadow-md transform hover:scale-[1.02]" asChild>
-                <Link href="/">
-                  <ContinuousLineHouseIcon className="mr-2 h-4 w-4 text-primary" /> 
-                  Back to Home
-                </Link>
               </Button>
             </form>
           </CardContent>

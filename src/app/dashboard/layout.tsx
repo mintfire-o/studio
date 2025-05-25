@@ -3,8 +3,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Image as ImageIcon, History, LogOut, Menu, Settings, User } from 'lucide-react'; 
-import ContinuousLineHouseIcon from '@/components/continuous-line-house-icon'; // Changed import
+import { Image as ImageIcon, History, LogOut, Menu, Settings, User, Feather } from 'lucide-react'; 
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { ThemeToggle } from '@/components/theme-toggle';
@@ -23,7 +22,7 @@ import { AnimatedBackground } from '@/components/animated-background';
 
 
 const navItems = [
-  { href: '/dashboard', label: 'Dashboard', icon: ContinuousLineHouseIcon }, // Changed icon
+  { href: '/dashboard', label: 'Dashboard', icon: Feather }, 
   { href: '/dashboard/new-project', label: 'New Project', icon: ImageIcon },
   { href: '/dashboard/history', label: 'History', icon: History },
   { href: '/dashboard/profile', label: 'Profile', icon: Settings },
@@ -62,7 +61,7 @@ export default function DashboardLayout({
         onClick={() => setIsSheetOpen(false)} 
       >
         <Link href={item.href}>
-          <item.icon className={`mr-3 h-5 w-5 ${pathname === item.href ? 'text-secondary-foreground' : 'text-primary'}`} /> {/* Adjusted icon color for active state */}
+          <item.icon className={`mr-3 h-5 w-5 ${pathname === item.href ? 'text-secondary-foreground' : 'text-primary'}`} /> 
           {item.label}
         </Link>
       </Button>
@@ -82,10 +81,10 @@ export default function DashboardLayout({
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="flex flex-col p-0 w-72 bg-background/90 backdrop-blur-md">
-              <SheetHeader className="border-b p-4"> {/* Added p-4 for padding consistency */}
+              <SheetHeader className="border-b p-4"> 
                 <SheetTitle>
                   <Link href="/dashboard" className="flex items-center gap-2 font-semibold text-lg" onClick={() => setIsSheetOpen(false)}>
-                    <ContinuousLineHouseIcon className="text-primary h-7 w-7" /> {/* Changed icon */}
+                    <Feather className="text-primary h-7 w-7" /> 
                     <span>La Interior</span>
                   </Link>
                 </SheetTitle>
@@ -102,7 +101,7 @@ export default function DashboardLayout({
             </SheetContent>
           </Sheet>
            <Link href="/dashboard" className="hidden md:flex items-center gap-2 font-semibold text-lg">
-             <ContinuousLineHouseIcon className="text-primary h-7 w-7" /> {/* Changed icon */}
+             <Feather className="text-primary h-7 w-7" /> 
              <span>La Interior</span>
            </Link>
         </div>

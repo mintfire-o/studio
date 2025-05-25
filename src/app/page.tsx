@@ -4,7 +4,7 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Brain, History, Lightbulb, Users, CheckCircle, Linkedin, Github, Mail, Phone, MapPin, SquarePen, WandSparkles, CircleCheckBig, Globe, Leaf, Loader2 } from 'lucide-react';
+import { Brain, History, Lightbulb, Users, CheckCircle, Linkedin, Github, Mail, Phone, MapPin, SquarePen, WandSparkles, CircleCheckBig, Globe, Leaf, Loader2, Palette } from 'lucide-react';
 import Image from 'next/image';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { AnimatedBackground } from '@/components/animated-background';
@@ -62,7 +62,7 @@ const teamMembers = [
     name: "Avik Samanta",
     role: "Founder\n\nCybersecurity Engineer | Blockchain Specialist | Bug Bounty Hunter",
     bio: "Skilled in vulnerability research, ethical hacking, and securing digital infrastructures. Passionate about advancing blockchain security, identifying threats, and building innovative security solutions.",
-    image: "https://placehold.co/300x300.png",
+    image: "https://drive.google.com/uc?export=view&id=1IdaPttBkC3dAB77nYp03oWPd4VMA1H-J",
     hint: "man illustration",
     socials: {
       github: "https://github.com/avik-root", 
@@ -73,7 +73,7 @@ const teamMembers = [
     name: "Anusha Gupta",
     role: "Founder\n\nSoftware Developer | AI Web Developer | Cybersecurity Enthusiast",
     bio: "Skilled in software and web development, AI integration, Python automation, and secure application design. Focused on leveraging machine learning and vulnerability research to create innovative, secure solutions.",
-    image: "https://placehold.co/300x300.png",
+    image: "https://placehold.co/300x300.png", // Kept placeholder as no new link was provided
     hint: "person portrait",
     socials: {
       github: "https://github.com/anushagupta11", 
@@ -243,7 +243,7 @@ export default function HomePage() {
                         alt={member.name} 
                         width={144} 
                         height={144} 
-                        className="object-cover w-full h-full rounded-md" // Slightly less rounding for inner image
+                        className="object-cover w-full h-full rounded-md"
                         data-ai-hint={member.hint}
                       />
                     </div>
